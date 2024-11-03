@@ -162,8 +162,8 @@ while True:
             if b['rect'].top > WINDOWHEIGHT:
                 baddies.remove(b)
 
-        # Draw the game world on the window.
-        windowSurface.fill(BACKGROUNDCOLOR)
+        # Draw scrolling background
+        windowSurface.blit(backgroundImage, (0,0))       
 
         # Draw the score and top score.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
