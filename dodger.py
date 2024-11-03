@@ -58,6 +58,7 @@ playerImage = pygame.image.load('player.png')
 playerRect = playerImage.get_rect()
 baddieImage = pygame.image.load('baddie.png')
 backgroundImage = pygame.image.load('Wood.jpg').convert()
+bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
 
 # Show the "Start" screen.
 windowSurface.fill(BACKGROUNDCOLOR)
