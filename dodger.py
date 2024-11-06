@@ -55,7 +55,7 @@ gameOverSound = pygame.mixer.Sound('gameover.wav')
 pygame.mixer.music.load('background.mid')
 
 # Set up images. CHANEGEMENT
-NEW_PLAYER_SIZE = (120, 120)  # Remplacez par la taille souhaitée pour le personnage
+NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
 playerImages = [pygame.transform.scale(pygame.image.load(f'player{i}.png'), NEW_PLAYER_SIZE) for i in range(1, 5)]
 playerIndex = 0  # Index de l'image courante pour l'animation
 playerRect = playerImages[0].get_rect() #CHANGEMENT
