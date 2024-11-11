@@ -47,9 +47,7 @@ pygame.display.set_caption('Spooky Sprint')
 pygame.mouse.set_visible(False)
 
 # Set up the fonts.
-font = pygame.font.SysFont(None, 48) #taille 48 pour le texte ; bold:True pour mettre le texte en gras
-#title_text = font.render('Spooky Sprint', True, (255, 255, 255)) #texte en blanc
-#title_text = title_text.get_rect(center=(WINDOWWIDTH // 2, 50)) #centré en haut de l'écran
+font = pygame.font.SysFont(None, 48) # taille 48 pour le texte
 
 # Set up sounds.
 gameOverSound = pygame.mixer.Sound('gameover.wav')
@@ -67,8 +65,8 @@ bgImage_StartScreen = pygame.transform.scale(backgroundImage_StartScreen, (WINDO
 # Show the "Start" screen.
 windowSurface.blit(bgImage_StartScreen, (0,0))
 #windowSurface.fill(BACKGROUNDCOLOR)
-drawText('Spooky Sprint', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
-drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 3) - 30, (WINDOWHEIGHT / 3) + 50)
+drawText('Spooky Sprint', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 6))
+drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 3) - 30, (WINDOWHEIGHT / 6) + 60)
 pygame.display.update()
 waitForPlayerToPressKey()
 
