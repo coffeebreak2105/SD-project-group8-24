@@ -79,12 +79,12 @@ pygame.mixer.music.play(-1, 0.0) #-1 pour que la musique soit à l'infini
 playerImage = pygame.image.load('player.png')
 playerRect = playerImage.get_rect()
 baddieImage = pygame.image.load('baddie.png')
-background_imagestart = pygame.image.load('forest.jpeg')
-background_imagestart = pygame.transform.scale(background_imagestart, (WINDOWWIDTH, WINDOWHEIGHT))
+backgroundImage_start = pygame.image.load('forest.jpeg')
+bgImage_start = pygame.transform.scale(backgroundImage_start, (WINDOWWIDTH, WINDOWHEIGHT))
 
 # Show the "Start" screen.
-#windowSurface.fill(background_imagestart, (0, 0))
-windowSurface.fill(BACKGROUNDCOLOR)
+windowSurface.fill(bgImage_start)
+#windowSurface.fill(BACKGROUNDCOLOR)
 drawText('Spooky Sprint', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
 drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 3) - 30, (WINDOWHEIGHT / 3) + 50)
 pygame.display.update()
