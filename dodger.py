@@ -39,28 +39,53 @@ def drawText(text, font, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
-# Set up pygame, the window, and the mouse cursor.
+# Set up pygame, the window, and the mouse cursor. -> page d'accueil
+#Initialisation de Pygame
 pygame.init()
+
+#Configurer la surface de la fenêtre
 mainClock = pygame.time.Clock()
 windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-pygame.display.set_caption('Dodger')
+pygame.display.set_caption('Spooky Sprint')
+
+#Masquer le curseur de la souris
 pygame.mouse.set_visible(False)
 
+#Charger l'image de fond
+#background_imagestart = pygame.image.load('forest.jpeg')
+#background_imagestart = pygame.transform.scale(background_imagestart, (WINDOWWIDTH, WINDOWHEIGHT))
+
+#Charger la musique de fond et la jouer en boucle
+#pygame.mixer.music.load('soundstart.mp3')
+#pygame.mixer.music.play(-1, 0.0) #-1 pour que la musique soit à l'infini
+
+#Définir une police pour le texte du titre 
+#font = pygame.font.SysFont(None, 48, bold=True) #taille 48 pour le texte ; bold:True pour mettre le texte en gras
+#title_text = font.render('Spooky Sprint', True, (255, 255, 255)) #texte en blanc
+#title_text = title_text.get_rect(center=(WINDOWWIDTH // 2, 50)) #centré en haut de l'écran
+
 # Set up the fonts.
-font = pygame.font.SysFont(None, 48)
+font = pygame.font.SysFont(None, 48, bold=True) #taille 48 pour le texte ; bold:True pour mettre le texte en gras
+title_text = font.render('Spooky Sprint', True, (255, 255, 255)) #texte en blanc
+title_text = title_text.get_rect(center=(WINDOWWIDTH // 2, 50)) #centré en haut de l'écran
 
 # Set up sounds.
 gameOverSound = pygame.mixer.Sound('gameover.wav')
 pygame.mixer.music.load('background.mid')
+pygame.mixer.music.load('soundstart.mp3') #musique page accueil
+pygame.mixer.music.play(-1, 0.0) #-1 pour que la musique soit à l'infini
 
 # Set up images.
 playerImage = pygame.image.load('player.png')
 playerRect = playerImage.get_rect()
 baddieImage = pygame.image.load('baddie.png')
+background_imagestart = pygame.image.load('forest.jpeg')
+background_imagestart = pygame.transform.scale(background_imagestart, (WINDOWWIDTH, WINDOWHEIGHT))
 
 # Show the "Start" screen.
+#windowSurface.fill(background_imagestart, (0, 0))
 windowSurface.fill(BACKGROUNDCOLOR)
-drawText('Dodger', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
+drawText('Spooky Sprint', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
 drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 3) - 30, (WINDOWHEIGHT / 3) + 50)
 pygame.display.update()
 waitForPlayerToPressKey()
