@@ -10,7 +10,7 @@ BADDIEMINSIZE = 10
 BADDIEMAXSIZE = 40
 BADDIEMINSPEED = 1
 BADDIEMAXSPEED = 8
-ADDNEWBADDIERATE =40
+ADDNEWBADDIERATE = 40
 PLAYERMOVERATE = 5
 
 def terminate():
@@ -120,21 +120,19 @@ while True:
                 if event.key == K_DOWN or event.key == K_s:
                     moveDown = False
 
-            if event.type == MOUSEMOTION:
-                # If the mouse moves, move the player where to the cursor.
-                playerRect.centerx = event.pos[0]
-                playerRect.centery = event.pos[1]
-        # Add new baddies at the top of the screen, if needed.
+
+        # Add new baddies from the right side at the bottom of the screen.
         if not reverseCheat and not slowCheat:
             baddieAddCounter += 1
         if baddieAddCounter == ADDNEWBADDIERATE:
             baddieAddCounter = 0
             baddieSize = random.randint(BADDIEMINSIZE, BADDIEMAXSIZE)
-            newBaddie = {'rect': pygame.Rect(random.randint(0, WINDOWWIDTH - baddieSize), 0 - baddieSize, baddieSize, baddieSize),
-                        'speed': random.randint(BADDIEMINSPEED, BADDIEMAXSPEED),
-                        'surface':pygame.transform.scale(baddieImage, (baddieSize, baddieSize)),
-                        }
-
+            # Position the new baddie on the right side at a random vertical position near the bottom.
+            newBaddie = {
+                'rect': pygame.Rect(WINDOWWIDTH, WINDOWHEIGHT - baddieSize, baddieSize, baddieSize),
+                'speed': random.randint(BADDIEMINSPEED, BADDIEMAXSPEED),
+                'surface': pygame.transform.scale(baddieImage, (baddieSize, baddieSize)),
+            }
             baddies.append(newBaddie)
 
         # Move the player around.
@@ -147,19 +145,17 @@ while True:
         if moveDown and playerRect.bottom < WINDOWHEIGHT:
             playerRect.move_ip(0, PLAYERMOVERATE)
 
-        # Move the baddies down.
+            # Move the baddies to the left across the bottom of the screen.
         for b in baddies:
             if not reverseCheat and not slowCheat:
-                b['rect'].move_ip(0, b['speed'])
+                b['rect'].move_ip(-b['speed'], 0)  # Move left
             elif reverseCheat:
-                b['rect'].move_ip(0, -5)
+                b['rect'].move_ip(5, 0)  # Move right if reverse cheat is active
             elif slowCheat:
-                b['rect'].move_ip(0, 1)
+                b['rect'].move_ip(-1, 0)  # Move left slowly if slow cheat is active
 
-        # Delete baddies that have fallen past the bottom.
-        for b in baddies[:]:
-            if b['rect'].top > WINDOWHEIGHT:
-                baddies.remove(b)
+  # Delete baddies that have gone off the left side of the screen.
+        baddies = [b for b in baddies if b['rect'].right > 0]
 
         # Draw the game world on the window.
         windowSurface.fill(BACKGROUNDCOLOR)
