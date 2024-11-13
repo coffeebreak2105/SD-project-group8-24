@@ -12,6 +12,8 @@ BADDIEMINSPEED = 1
 BADDIEMAXSPEED = 8
 ADDNEWBADDIERATE = 40
 PLAYERMOVERATE = 5
+JUMPSPEED = 15
+GRAVITY = 1
 
 def terminate():
     pygame.quit()
@@ -74,6 +76,8 @@ while True:
     moveLeft = moveRight = moveUp = moveDown = False
     reverseCheat = slowCheat = False
     baddieAddCounter = 0
+    isJumping = False
+    jumpSpeed = JUMPSPEED  # Initial jump speed
     pygame.mixer.music.play(-1, 0.0)
 
     while True: # The game loop runs while the game part is playing.
@@ -94,12 +98,9 @@ while True:
                 if event.key == K_RIGHT or event.key == K_d:
                     moveLeft = False
                     moveRight = True
-                if event.key == K_UP or event.key == K_w:
-                    moveDown = False
-                    moveUp = True
-                if event.key == K_DOWN or event.key == K_s:
-                    moveUp = False
-                    moveDown = True
+                if event.key == K_SPACE and not isJumping:
+                    isJumping = True  # Start the jump
+                    jumpSpeed = JUMPSPEED  # Reset jump speed for the jump
 
             if event.type == KEYUP:
                 if event.key == K_z:
@@ -115,10 +116,6 @@ while True:
                     moveLeft = False
                 if event.key == K_RIGHT or event.key == K_d:
                     moveRight = False
-                if event.key == K_UP or event.key == K_w:
-                    moveUp = False
-                if event.key == K_DOWN or event.key == K_s:
-                    moveDown = False
 
 
         # Add new baddies from the right side at the bottom of the screen.
@@ -140,12 +137,18 @@ while True:
             playerRect.move_ip(-1 * PLAYERMOVERATE, 0)
         if moveRight and playerRect.right < WINDOWWIDTH:
             playerRect.move_ip(PLAYERMOVERATE, 0)
-        if moveUp and playerRect.top > 0:
-            playerRect.move_ip(0, -1 * PLAYERMOVERATE)
-        if moveDown and playerRect.bottom < WINDOWHEIGHT:
-            playerRect.move_ip(0, PLAYERMOVERATE)
+        
+        # Handle jumping
+        if isJumping:
+            playerRect.move_ip(0, -jumpSpeed)  # Move up initially
+            jumpSpeed -= GRAVITY  # Gravity effect
 
-            # Move the baddies to the left across the bottom of the screen.
+            # If the player lands on the ground
+            if playerRect.bottom >= WINDOWHEIGHT - 50:
+                playerRect.bottom = WINDOWHEIGHT - 50
+                isJumping = False
+
+        # Move the baddies to the left across the bottom of the screen.
         for b in baddies:
             if not reverseCheat and not slowCheat:
                 b['rect'].move_ip(-b['speed'], 0)  # Move left
