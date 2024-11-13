@@ -2,7 +2,7 @@ import pygame, random, sys
 from pygame.locals import *
 
 ANIMATION_SPEED = 5  # CHANGEMENT Vitesse d'animation (nombre de frames avant de changer d'image)
-WINDOWWIDTH = 600
+WINDOWWIDTH = 1500
 WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
 BACKGROUNDCOLOR = (255, 255, 255)
