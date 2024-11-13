@@ -1,7 +1,7 @@
 import pygame, random, sys
 from pygame.locals import *
 
-WINDOWWIDTH = 600
+WINDOWWIDTH = 1500
 WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
 BACKGROUNDCOLOR = (255, 255, 255)
@@ -57,6 +57,10 @@ pygame.mixer.music.load('background.mid')
 playerImage = pygame.image.load('player.png')
 playerRect = playerImage.get_rect()
 baddieImage = pygame.image.load('baddie.png')
+backgroundImage = pygame.image.load('Wood.jpg').convert()
+bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
+Speed = 5 # vitesse de défilement de l'arrière-plan
+bg_x = 0 # position de départ de l'arrière-plan
 
 # Show the "Start" screen.
 windowSurface.fill(BACKGROUNDCOLOR)
@@ -161,8 +165,13 @@ while True:
             if b['rect'].top > WINDOWHEIGHT:
                 baddies.remove(b)
 
-        # Draw the game world on the window.
-        windowSurface.fill(BACKGROUNDCOLOR)
+        # Draw scrolling background
+        windowSurface.blit(bgImage, (bg_x, 0))
+        windowSurface.blit(bgImage, (bg_x + WINDOWWIDTH, 0))
+        bg_x -= Speed # déplacer arrière-plan vers la gauche
+
+        if bg_x <= -WINDOWWIDTH:
+            bg_x = 0       
 
         # Draw the score and top score.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
