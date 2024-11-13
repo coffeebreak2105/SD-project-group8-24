@@ -10,10 +10,11 @@ BADDIEMINSIZE = 10
 BADDIEMAXSIZE = 40
 BADDIEMINSPEED = 2
 BADDIEMAXSPEED = 5
-ADDNEWBADDIERATE = 40
+ADDNEWBADDIERATE = 40 # Fréquence d'apparition des ennemis
 PLAYERMOVERATE = 5
 JUMPSPEED = 15
 GRAVITY = 1
+GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
 
 def terminate():
     pygame.quit()
@@ -72,12 +73,12 @@ while True:
     # Set up the start of the game.
     baddies = []
     score = 0
-    playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)
-    moveLeft = moveRight = moveUp = moveDown = False
+    playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL -playerRect.height)
+    moveLeft = moveRight = False
     reverseCheat = slowCheat = False
-    baddieAddCounter = 0
     isJumping = False
     jumpSpeed = JUMPSPEED  # Initial jump speed
+    baddieAddCounter = 0
     pygame.mixer.music.play(-1, 0.0)
 
     while True: # The game loop runs while the game part is playing.
@@ -126,7 +127,7 @@ while True:
             baddieSize = random.randint(BADDIEMINSIZE, BADDIEMAXSIZE)
             # Position the new baddie on the right side at a random vertical position near the bottom.
             newBaddie = {
-                'rect': pygame.Rect(WINDOWWIDTH, WINDOWHEIGHT - baddieSize, baddieSize, baddieSize),
+                'rect': pygame.Rect(WINDOWWIDTH, GROUND_LEVEL - baddieSize, baddieSize, baddieSize),
                 'speed': random.randint(BADDIEMINSPEED, BADDIEMAXSPEED),
                 'surface': pygame.transform.scale(baddieImage, (baddieSize, baddieSize)),
             }
@@ -144,9 +145,10 @@ while True:
             jumpSpeed -= GRAVITY  # Gravity effect
 
             # If the player lands on the ground
-            if playerRect.bottom >= WINDOWHEIGHT - 50:
-                playerRect.bottom = WINDOWHEIGHT - 50
+            if playerRect.bottom >= GROUND_LEVEL:
+                playerRect.bottom = GROUND_LEVEL
                 isJumping = False
+                jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
 
         # Move the baddies to the left across the bottom of the screen.
         for b in baddies:
