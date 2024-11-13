@@ -10,8 +10,12 @@ BADDIEMINSIZE = 10
 BADDIEMAXSIZE = 40
 BADDIEMINSPEED = 1
 BADDIEMAXSPEED = 8
-ADDNEWBADDIERATE = 6
+ADDNEWBADDIERATE = 50
 PLAYERMOVERATE = 5
+ADDNEWBONUSRATE = 50  # Adjust the frequency of bonus appearance
+isFlying = False
+flyingCounter = 0
+FLYING_DURATION = 300 
 
 def terminate():
     pygame.quit()
@@ -31,7 +35,16 @@ def playerHasHitBaddie(playerRect, baddies):
     for b in baddies:
         if playerRect.colliderect(b['rect']):
             return True
+        elif isFlying:
+            return False  # Ignore les collisions en mode survol
     return False
+
+
+def playerHasCollectedBonus(playerRect, bonuses):
+    for bonus in bonuses:
+        if playerRect.colliderect(bonus['rect']):
+            return bonus  # Retourne le bonus collecté pour un traitement ultérieur
+    return None  # Retourne None si aucune collision avec un bonus n'a été détectée
 
 def drawText(text, font, surface, x, y):
     textobj = font.render(text, 1, TEXTCOLOR)
@@ -57,6 +70,7 @@ pygame.mixer.music.load('background.mid')
 playerImage = pygame.image.load('player.png')
 playerRect = playerImage.get_rect()
 baddieImage = pygame.image.load('baddie.png')
+bonusImage = pygame.image.load('bonus.png')
 
 # Show the "Start" screen.
 windowSurface.fill(BACKGROUNDCOLOR)
@@ -69,11 +83,15 @@ topScore = 0
 while True:
     # Set up the start of the game.
     baddies = []
+    bonuses = []
     score = 0
+    isFlying = False
+    flyingCounter = 0
     playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)
     moveLeft = moveRight = moveUp = moveDown = False
     reverseCheat = slowCheat = False
     baddieAddCounter = 0
+    bonusAddCounter = 0
     pygame.mixer.music.play(-1, 0.0)
 
     while True: # The game loop runs while the game part is playing.
@@ -124,6 +142,17 @@ while True:
                 # If the mouse moves, move the player where to the cursor.
                 playerRect.centerx = event.pos[0]
                 playerRect.centery = event.pos[1]
+
+        # Add new bonuses at the top of the screen, if needed.
+        bonusAddCounter += 1
+        if bonusAddCounter == ADDNEWBONUSRATE:
+            bonusAddCounter = 0
+            newBonus = {'rect': pygame.Rect(random.randint(0, WINDOWWIDTH - 40), 0 - 40, 40, 40),
+                        'speed': random.randint(1, 3),
+                        'surface': pygame.transform.scale(bonusImage, (30, 30)),
+                         }
+            bonuses.append(newBonus)
+
         # Add new baddies at the top of the screen, if needed.
         if not reverseCheat and not slowCheat:
             baddieAddCounter += 1
@@ -147,6 +176,14 @@ while True:
         if moveDown and playerRect.bottom < WINDOWHEIGHT:
             playerRect.move_ip(0, PLAYERMOVERATE)
 
+        # Move the bonuses down
+        for b in bonuses:
+            b['rect'].move_ip(0, b['speed'])
+
+        # Draw each bonus
+        for b in bonuses:
+            windowSurface.blit(b['surface'], b['rect'])
+
         # Move the baddies down.
         for b in baddies:
             if not reverseCheat and not slowCheat:
@@ -160,6 +197,11 @@ while True:
         for b in baddies[:]:
             if b['rect'].top > WINDOWHEIGHT:
                 baddies.remove(b)
+
+        # Delete bonuses that have fallen past the bottom
+        for b in bonuses[:]:
+            if b['rect'].top > WINDOWHEIGHT:
+                bonuses.remove(b)
 
         # Draw the game world on the window.
         windowSurface.fill(BACKGROUNDCOLOR)
@@ -183,7 +225,22 @@ while True:
                 topScore = score # set new top score
             break
 
-        mainClock.tick(FPS)
+        if isFlying:
+            flyingCounter -= 1
+        if flyingCounter <= 0:
+            isFlying = False  # Désactive le mode survol après la durée spécifiée
+
+       # Check if the player has collected any bonuses
+        for b in bonuses[:]:
+            if playerRect.colliderect(b['rect']):
+                bonuses.remove(b)
+                isFlying = True  # Active le mode survol
+                flyingCounter = FLYING_DURATION
+                PLAYERMOVERATE += 1  # Increase speed (if you want to keep this effect)
+                score += 50  # Increase score (if you want to keep this effect)
+
+            pygame.display.update()
+            mainClock.tick(FPS)
 
     # Stop the game and show the "Game Over" screen.
     pygame.mixer.music.stop()
