@@ -54,7 +54,7 @@ font = pygame.font.SysFont(None, 48)
 gameOverSound = pygame.mixer.Sound('gameover.wav')
 pygame.mixer.music.load('background.mid')
 
-# Set up images. CHANEGEMENT
+# Set up images. CHANGEMENT
 NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
 playerImages = [pygame.transform.scale(pygame.image.load(f'player{i}.png'), NEW_PLAYER_SIZE) for i in range(1, 5)]
 playerIndex = 0  # Index de l'image courante pour l'animation
