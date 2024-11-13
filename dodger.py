@@ -60,6 +60,10 @@ playerImages = [pygame.transform.scale(pygame.image.load(f'player{i}.png'), NEW_
 playerIndex = 0  # Index de l'image courante pour l'animation
 playerRect = playerImages[0].get_rect() #CHANGEMENT
 baddieImage = pygame.image.load('baddie.png')
+backgroundImage = pygame.image.load('Wood.jpg').convert()
+bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
+Speed = 5 # vitesse de défilement de l'arrière-plan
+bg_x = 0 # position de départ de l'arrière-plan
 
 # Show the "Start" screen.
 windowSurface.fill(BACKGROUNDCOLOR)
@@ -172,8 +176,13 @@ while True:
             if b['rect'].top > WINDOWHEIGHT:
                 baddies.remove(b)
 
-        # Draw the game world on the window.
-        windowSurface.fill(BACKGROUNDCOLOR)
+        # Draw scrolling background
+        windowSurface.blit(bgImage, (bg_x, 0))
+        windowSurface.blit(bgImage, (bg_x + WINDOWWIDTH, 0))
+        bg_x -= Speed # déplacer arrière-plan vers la gauche
+
+        if bg_x <= -WINDOWWIDTH:
+            bg_x = 0       
 
         # Draw the score and top score.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
