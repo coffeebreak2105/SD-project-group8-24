@@ -55,8 +55,15 @@ gameOverSound = pygame.mixer.Sound('gameover.wav')
 pygame.mixer.music.load('background.mid')
 
 # Set up images. CHANGEMENT
-NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
-playerImages = [pygame.transform.scale(pygame.image.load(f'player{i}.png'), NEW_PLAYER_SIZE) for i in range(1, 5)]
+# Charger les images des joueurs et retirer le fond blanc
+NEW_PLAYER_SIZE = (140, 140)  # Taille souhaitée pour le joueur
+playerImages = []
+for i in range(1, 5):
+    image = pygame.image.load(f'player{i}.png').convert()  # Charger l'image
+    image.set_colorkey((255, 255, 255))  # Rendre le blanc transparent
+    image = pygame.transform.scale(image, NEW_PLAYER_SIZE)  # Redimensionner
+    playerImages.append(image)
+
 playerIndex = 0  # Index de l'image courante pour l'animation
 playerRect = playerImages[0].get_rect() #CHANGEMENT
 baddieImage = pygame.image.load('baddie.png')
