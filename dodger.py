@@ -1,6 +1,7 @@
 import pygame, random, sys
 from pygame.locals import *
 
+ANIMATION_SPEED = 5  # CHANGEMENT Vitesse d'animation (nombre de frames avant de changer d'image)
 WINDOWWIDTH = 1500
 WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
@@ -53,9 +54,11 @@ font = pygame.font.SysFont(None, 48)
 gameOverSound = pygame.mixer.Sound('gameover.wav')
 pygame.mixer.music.load('background.mid')
 
-# Set up images.
-playerImage = pygame.image.load('player.png')
-playerRect = playerImage.get_rect()
+# Set up images. CHANGEMENT
+NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
+playerImages = [pygame.transform.scale(pygame.image.load(f'player{i}.png'), NEW_PLAYER_SIZE) for i in range(1, 5)]
+playerIndex = 0  # Index de l'image courante pour l'animation
+playerRect = playerImages[0].get_rect() #CHANGEMENT
 baddieImage = pygame.image.load('baddie.png')
 backgroundImage = pygame.image.load('Wood.jpg').convert()
 bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
@@ -68,6 +71,9 @@ drawText('Dodger', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
 drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 3) - 30, (WINDOWHEIGHT / 3) + 50)
 pygame.display.update()
 waitForPlayerToPressKey()
+
+playerIndex = 0  # CHANGEMENT Index de l'image actuelle pour l'animation
+animationCounter = 0  # CHANGEMENT Compteur pour contrôler la vitesse d'animation
 
 topScore = 0
 while True:
@@ -150,6 +156,11 @@ while True:
             playerRect.move_ip(0, -1 * PLAYERMOVERATE)
         if moveDown and playerRect.bottom < WINDOWHEIGHT:
             playerRect.move_ip(0, PLAYERMOVERATE)
+ # Update player animation CHANGEMENT
+        animationCounter += 1
+        if animationCounter >= ANIMATION_SPEED:
+            animationCounter = 0
+            playerIndex = (playerIndex + 1) % len(playerImages)  # Passer à l'image suivante en boucle
 
         # Move the baddies down.
         for b in baddies:
@@ -178,7 +189,7 @@ while True:
         drawText('Top Score: %s' % (topScore), font, windowSurface, 10, 40)
 
         # Draw the player's rectangle.
-        windowSurface.blit(playerImage, playerRect)
+        windowSurface.blit(playerImages[playerIndex], playerRect) #CHANGEMENT
 
         # Draw each baddie.
         for b in baddies:
