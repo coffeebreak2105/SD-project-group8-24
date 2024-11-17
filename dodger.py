@@ -78,8 +78,6 @@ playerRect = playerImages[0].get_rect() #CHANGEMENT
 baddieImage = pygame.image.load('baddie.png')
 backgroundImage = pygame.image.load('Wood.jpg').convert()
 bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
-Speed = 5 # vitesse de défilement de l'arrière-plan
-bg_x = 0 # position de départ de l'arrière-plan
 birdImage = pygame.image.load('Bird.jpg').convert() 
 frogImage = pygame.image.load('Frog.jpg').convert()
 frogImage = pygame.transform.scale(frogImage, (100, 100))
@@ -95,6 +93,10 @@ waitForPlayerToPressKey()
 # Set up player.
 playerIndex = 0  # CHANGEMENT Index de l'image actuelle pour l'animation
 animationCounter = 0  # CHANGEMENT Compteur pour contrôler la vitesse d'animation
+
+# Set up backgroundImage.
+Speed = 5 # vitesse de défilement de l'arrière-plan
+bg_x = 0 # position de départ de l'arrière-plan
 
 # Set up ObjectMagic.
 frogRect = frogImage.get_rect() # obtenir dimension image
