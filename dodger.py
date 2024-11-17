@@ -27,8 +27,6 @@ class ObjectMagic:
         elif points == 20:
             self.display = ...
 
-
-
 def terminate():
     pygame.quit()
     sys.exit()
@@ -79,6 +77,9 @@ backgroundImage = pygame.image.load('Wood.jpg').convert()
 bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
 Speed = 5 # vitesse de défilement de l'arrière-plan
 bg_x = 0 # position de départ de l'arrière-plan
+birdImage = pygame.image.load('Bird.jpg').convert() 
+frogImage = pygame.image.load('Frog.jpg').convert()
+teapotImage = pygame.image.load('TeaPot.png').convert()
 
 # Show the "Start" screen.
 windowSurface.fill(BACKGROUNDCOLOR)
