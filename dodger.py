@@ -102,6 +102,7 @@ bg_x = 0 # position de départ de l'arrière-plan
 frogRect = frogImage.get_rect() # obtenir dimension image
 frogRect.bottom = WINDOWHEIGHT # positionner en bas de la fenêtre
 frog_x = 0 # position initiale en x de frogImage alignée à gauche
+frogMagic = ObjectMagic(10)
 
 topScore = 0
 while True:
@@ -212,11 +213,19 @@ while True:
         if bg_x <= -WINDOWWIDTH:
             bg_x = 0
 
-        # Draw ObjectMagic
-        windowSurface.blit(frogImage, (frog_x, frogRect.bottom - frogRect.height))
+        # Draw ObjectMagic.
+        windowSurface.blit(frogImage, (frog_x, frogRect.y))
         frog_x -= Speed # déplacement frog vers la gauche avec le fond
 
         if frog_x <= -frogRect.width:
+            frog_x = WINDOWWIDTH
+        # Mettre a jour position de frogRect en fonction de frog_x.
+        frogRect.x = frog_x
+        frogRect.y = WINDOWHEIGHT - frogRect.height
+        
+        # Check if player has hit ObjectMagic.
+        if playerRect.colliderect(frogRect):
+            score += frogMagic.points
             frog_x = WINDOWWIDTH
 
         # Draw the score and top score.
