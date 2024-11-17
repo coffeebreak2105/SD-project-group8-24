@@ -92,6 +92,7 @@ drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 3) - 30, (
 pygame.display.update()
 waitForPlayerToPressKey()
 
+# Set up player.
 playerIndex = 0  # CHANGEMENT Index de l'image actuelle pour l'animation
 animationCounter = 0  # CHANGEMENT Compteur pour contrôler la vitesse d'animation
 
@@ -181,7 +182,7 @@ while True:
             playerRect.move_ip(0, -1 * PLAYERMOVERATE)
         if moveDown and playerRect.bottom < WINDOWHEIGHT:
             playerRect.move_ip(0, PLAYERMOVERATE)
- # Update player animation CHANGEMENT
+        # Update player animation CHANGEMENT
         animationCounter += 1
         if animationCounter >= ANIMATION_SPEED:
             animationCounter = 0
