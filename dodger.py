@@ -94,6 +94,11 @@ waitForPlayerToPressKey()
 playerIndex = 0  # CHANGEMENT Index de l'image actuelle pour l'animation
 animationCounter = 0  # CHANGEMENT Compteur pour contrôler la vitesse d'animation
 
+# Set up ObjectMagic.
+frogRect = frogImage.get_rect() # obtenir dimension image
+frogRect.bottom = WINDOWHEIGHT # positionner en bas de la fenêtre
+frog_x = 0 # position initiale en x de frogImage alignée à gauche
+
 topScore = 0
 while True:
     # Set up the start of the game.
