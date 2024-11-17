@@ -206,7 +206,14 @@ while True:
         bg_x -= Speed # déplacer arrière-plan vers la gauche
 
         if bg_x <= -WINDOWWIDTH:
-            bg_x = 0       
+            bg_x = 0
+
+        # Draw ObjectMagic
+        windowSurface.blit(frogImage, (frog_x, frogRect.bottom - frogRect.height))
+        frog_x -= Speed # déplacement frog vers la gauche avec le fond
+
+        if frog_x <= -frogRect.width:
+            frog_x = WINDOWWIDTH
 
         # Draw the score and top score.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
