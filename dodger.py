@@ -21,11 +21,11 @@ class ObjectMagic:
 
     def change_display(points):
         if points == 10:
-            self.display = ...
+            self.display = frogImage
         elif points == 15:
-            self.display = ...
+            self.display = birdImage
         elif points == 20:
-            self.display = ...
+            self.display = teapotImage
 
 def terminate():
     pygame.quit()
