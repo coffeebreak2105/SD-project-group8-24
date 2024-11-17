@@ -82,6 +82,7 @@ Speed = 5 # vitesse de défilement de l'arrière-plan
 bg_x = 0 # position de départ de l'arrière-plan
 birdImage = pygame.image.load('Bird.jpg').convert() 
 frogImage = pygame.image.load('Frog.jpg').convert()
+frogImage = pygame.transform.scale(frogImage, (100, 100))
 teapotImage = pygame.image.load('TeaPot.png').convert()
 
 # Show the "Start" screen.
