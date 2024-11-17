@@ -14,6 +14,21 @@ BADDIEMAXSPEED = 8
 ADDNEWBADDIERATE = 6
 PLAYERMOVERATE = 5
 
+class ObjectMagic:
+    def __init__(self, points):
+        self.points = points
+        self.display = change_display(points)
+
+    def change_display(points):
+        if points == 10:
+            self.display = ...
+        elif points == 15:
+            self.display = ...
+        elif points == 20:
+            self.display = ...
+
+
+
 def terminate():
     pygame.quit()
     sys.exit()
