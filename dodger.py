@@ -17,15 +17,18 @@ PLAYERMOVERATE = 5
 class ObjectMagic:
     def __init__(self, points):
         self.points = points
-        self.display = change_display(points)
+        self.display = None
+        self.change_display()
 
-    def change_display(points):
-        if points == 10:
+    def change_display(self):
+        if self.points == 10:
             self.display = frogImage
-        elif points == 15:
+        elif self.points == 15:
             self.display = birdImage
-        elif points == 20:
+        elif self.points == 20:
             self.display = teapotImage
+        else:
+            self.display = None
 
 def terminate():
     pygame.quit()
