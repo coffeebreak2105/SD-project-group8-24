@@ -1,7 +1,8 @@
 import pygame, random, sys
 from pygame.locals import *
 
-WINDOWWIDTH = 600
+ANIMATION_SPEED = 5
+WINDOWWIDTH = 1500
 WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
 BACKGROUNDCOLOR = (255, 255, 255)
@@ -12,10 +13,7 @@ BADDIEMINSPEED = 1
 BADDIEMAXSPEED = 8
 ADDNEWBADDIERATE = 50
 PLAYERMOVERATE = 5
-ADDNEWBONUSRATE = 50  # Adjust the frequency of bonus appearance
-isFlying = False
-flyingCounter = 0
-FLYING_DURATION = 300 
+ADDNEWBONUSRATE = 100  # Adjust the frequency of bonus appearance
 
 def terminate():
     pygame.quit()
@@ -35,8 +33,6 @@ def playerHasHitBaddie(playerRect, baddies):
     for b in baddies:
         if playerRect.colliderect(b['rect']):
             return True
-        elif isFlying:
-            return False  # Ignore les collisions en mode survol
     return False
 
 
@@ -85,8 +81,6 @@ while True:
     baddies = []
     bonuses = []
     score = 0
-    isFlying = False
-    flyingCounter = 0
     playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)
     moveLeft = moveRight = moveUp = moveDown = False
     reverseCheat = slowCheat = False
@@ -147,7 +141,8 @@ while True:
         bonusAddCounter += 1
         if bonusAddCounter == ADDNEWBONUSRATE:
             bonusAddCounter = 0
-            newBonus = {'rect': pygame.Rect(random.randint(0, WINDOWWIDTH - 40), 0 - 40, 40, 40),
+            bonusSize = (20,20)
+            newBonus = {'rect': pygame.Rect(random.randint(0, WINDOWHEIGHT - 40), 0 - 40, 40, 40),
                         'speed': random.randint(1, 3),
                         'surface': pygame.transform.scale(bonusImage, (30, 30)),
                          }
@@ -220,22 +215,15 @@ while True:
         pygame.display.update()
 
         # Check if any of the baddies have hit the player.
-        if playerHasHitBaddie(playerRect, baddies):
+        if playerHasHitBaddie(playerRect, baddies) :
             if score > topScore:
                 topScore = score # set new top score
             break
-
-        if isFlying:
-            flyingCounter -= 1
-        if flyingCounter <= 0:
-            isFlying = False  # Désactive le mode survol après la durée spécifiée
 
        # Check if the player has collected any bonuses
         for b in bonuses[:]:
             if playerRect.colliderect(b['rect']):
                 bonuses.remove(b)
-                isFlying = True  # Active le mode survol
-                flyingCounter = FLYING_DURATION
                 PLAYERMOVERATE += 1  # Increase speed (if you want to keep this effect)
                 score += 50  # Increase score (if you want to keep this effect)
 
