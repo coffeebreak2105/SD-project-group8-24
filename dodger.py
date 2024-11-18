@@ -78,10 +78,10 @@ playerRect = playerImages[0].get_rect() #CHANGEMENT
 baddieImage = pygame.image.load('baddie.png')
 backgroundImage = pygame.image.load('Wood.jpg').convert()
 bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
-birdImage = pygame.image.load('Bird.jpg').convert() 
-frogImage = pygame.image.load('Frog.jpg').convert()
+birdImage = pygame.image.load('Bird.png').convert_alpha() 
+frogImage = pygame.image.load('Frog.png').convert_alpha()
 frogImage = pygame.transform.scale(frogImage, (100, 100))
-teapotImage = pygame.image.load('TeaPot.png').convert()
+teapotImage = pygame.image.load('TeaPot.png').convert_alpha()
 
 # Show the "Start" screen.
 windowSurface.fill(BACKGROUNDCOLOR)
