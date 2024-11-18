@@ -16,6 +16,22 @@ JUMPSPEED = 15
 GRAVITY = 1
 GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
 
+# Classe Baddie
+class Baddie:
+    def __init__(self, images, min_size, max_size, min_speed, max_speed):
+        self.size = random.randint(min_size, max_size)
+        self.image = pygame.transform.scale(
+            random.choice(images), (self.size, self.size)
+        )
+        self.speed = random.randint(min_speed, max_speed)
+        self.rect = pygame.Rect(WINDOWWIDTH, GROUND_LEVEL - self.size, self.size, self.size)
+
+    def move(self):
+        self.rect.move_ip(-self.speed, 0)
+
+    def is_off_screen(self):
+        return self.rect.right < 0
+    
 def terminate():
     pygame.quit()
     sys.exit()
@@ -32,7 +48,7 @@ def waitForPlayerToPressKey():
 
 def playerHasHitBaddie(playerRect, baddies):
     for b in baddies:
-        if playerRect.colliderect(b['rect']):
+        if playerRect.colliderect(b.rect):
             return True
     return False
 
@@ -59,7 +75,14 @@ pygame.mixer.music.load('background.mid')
 # Set up images.
 playerImage = pygame.image.load('player.png')
 playerRect = playerImage.get_rect()
-baddieImage = pygame.image.load('baddie.png')
+
+# Images pour les ennemis
+baddie_images = [
+    pygame.image.load('baddie1.png'),
+    pygame.image.load('baddie2.png'),
+    pygame.image.load('baddie3.png'),
+    pygame.image.load('baddie4.png'),
+]
 
 # Show the "Start" screen.
 windowSurface.fill(BACKGROUNDCOLOR)
@@ -124,14 +147,7 @@ while True:
             baddieAddCounter += 1
         if baddieAddCounter == ADDNEWBADDIERATE:
             baddieAddCounter = 0
-            baddieSize = random.randint(BADDIEMINSIZE, BADDIEMAXSIZE)
-            # Position the new baddie on the right side at a random vertical position near the bottom.
-            newBaddie = {
-                'rect': pygame.Rect(WINDOWWIDTH, GROUND_LEVEL - baddieSize, baddieSize, baddieSize),
-                'speed': random.randint(BADDIEMINSPEED, BADDIEMAXSPEED),
-                'surface': pygame.transform.scale(baddieImage, (baddieSize, baddieSize)),
-            }
-            baddies.append(newBaddie)
+            baddies.append(Baddie(baddie_images, BADDIEMINSIZE, BADDIEMAXSIZE, BADDIEMINSPEED, BADDIEMAXSPEED))
 
         # Move the player around.
         if moveLeft and playerRect.left > 0:
@@ -153,14 +169,14 @@ while True:
         # Move the baddies to the left across the bottom of the screen.
         for b in baddies:
             if not reverseCheat and not slowCheat:
-                b['rect'].move_ip(-b['speed'], 0)  # Move left
+                b.move()  # Move left
             elif reverseCheat:
-                b['rect'].move_ip(5, 0)  # Move right if reverse cheat is active
+                b.rect.move_ip(5, 0) # Move right if reverse cheat is active
             elif slowCheat:
-                b['rect'].move_ip(-1, 0)  # Move left slowly if slow cheat is active
+                b.rect.move_ip(-1, 0) # Move left slowly if slow cheat is active
 
   # Delete baddies that have gone off the left side of the screen.
-        baddies = [b for b in baddies if b['rect'].right > 0]
+        baddies = [b for b in baddies if not b.is_off_screen()]
 
         # Draw the game world on the window.
         windowSurface.fill(BACKGROUNDCOLOR)
@@ -174,7 +190,7 @@ while True:
 
         # Draw each baddie.
         for b in baddies:
-            windowSurface.blit(b['surface'], b['rect'])
+            windowSurface.blit(b.image, b.rect)
 
         pygame.display.update()
 
