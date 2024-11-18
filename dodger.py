@@ -77,7 +77,7 @@ NEW_PLAYER_SIZE = (220, 220)  # Taille souhaitée pour le joueur
 playerImages = []
 for i in range(1, 5):
     image = pygame.image.load(f'player{i}.png').convert()  # Charger l'image
-    image.set_colorkey((255, 255, 255))  # Rendre le blanc transparent
+    image.set_colorkey((0, 0, 0))  # Rendre le fond noir transparent
     image = pygame.transform.scale(image, NEW_PLAYER_SIZE)  # Redimensionner
     playerImages.append(image)
 
