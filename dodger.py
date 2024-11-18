@@ -14,6 +14,16 @@ BADDIEMAXSPEED = 8
 ADDNEWBADDIERATE = 6
 PLAYERMOVERATE = 5
 
+
+# Ajoutez une variable globale pour les vies
+LIVES = 3  # Nombre initial de vies # MODIFICATION
+
+# Charger l'image des cœurs # MODIFICATION
+HEART_SIZE = (50, 50)  # Taille des cœurs
+heartImage = pygame.image.load('heart.png')  # Image de cœur
+heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
+
+
 def terminate():
     pygame.quit()
     sys.exit()
@@ -40,6 +50,13 @@ def drawText(text, font, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
+#Fonction pour afficher les coeurs
+def drawHearts(surface, lives, heartImage, start_x, start_y):
+    """Affiche les cœurs en fonction des vies restantes à une position donnée."""
+    for i in range(lives):
+        surface.blit(heartImage, (start_x + i * (HEART_SIZE[0] + 5), start_y))
+
+          
 # Set up pygame, the window, and the mouse cursor.
 pygame.init()
 mainClock = pygame.time.Clock()
@@ -56,7 +73,7 @@ pygame.mixer.music.load('background.mid')
 
 # Set up images. CHANGEMENT
 # Charger les images des joueurs et retirer le fond blanc
-NEW_PLAYER_SIZE = (140, 140)  # Taille souhaitée pour le joueur
+NEW_PLAYER_SIZE = (220, 220)  # Taille souhaitée pour le joueur
 playerImages = []
 for i in range(1, 5):
     image = pygame.image.load(f'player{i}.png').convert()  # Charger l'image
@@ -91,6 +108,7 @@ while True:
     moveLeft = moveRight = moveUp = moveDown = False
     reverseCheat = slowCheat = False
     baddieAddCounter = 0
+    lives = LIVES  # Initialiser les vies pour chaque nouvelle partie # MODIFICATION
     pygame.mixer.music.play(-1, 0.0)
 
     while True: # The game loop runs while the game part is playing.
@@ -194,6 +212,8 @@ while True:
         # Draw the score and top score.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
         drawText('Top Score: %s' % (topScore), font, windowSurface, 10, 40)
+        top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte) #MODIFICATION Affichage des coeurs
+        drawHearts(windowSurface, lives, heartImage, 10, top_score_y)
 
         # Draw the player's rectangle.
         windowSurface.blit(playerImages[playerIndex], playerRect) #CHANGEMENT
@@ -202,13 +222,24 @@ while True:
         for b in baddies:
             windowSurface.blit(b['surface'], b['rect'])
 
+        # Afficher les cœurs restants MODIFICATION
+        top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte)
+        drawHearts(windowSurface, lives, heartImage, 10, top_score_y)
+
+
         pygame.display.update()
 
         # Check if any of the baddies have hit the player.
         if playerHasHitBaddie(playerRect, baddies):
-            if score > topScore:
-                topScore = score # set new top score
-            break
+            lives -= 1  # Réduire les vies # MODIFICATION
+            if lives <= 0:  # Si plus de vies, fin du jeu # MODIFICATION
+                if score > topScore:
+                    topScore = score  # set new top score
+                break
+            else:
+                # Réinitialisez la position du joueur
+                playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)  # MODIFICATION
+                baddies = []  # Réinitialisez les baddies # MODIFICATION
 
         mainClock.tick(FPS)
 
