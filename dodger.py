@@ -1,7 +1,7 @@
 import pygame, random, sys
 from pygame.locals import *
 
-WINDOWWIDTH = 600
+WINDOWWIDTH = 1200
 WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
 BACKGROUNDCOLOR = (255, 255, 255)
@@ -59,14 +59,14 @@ pygame.mixer.music.play(-1, 0.0) # -1 pour que la musique soit à l'infini
 playerImage = pygame.image.load('player.png')
 playerRect = playerImage.get_rect()
 baddieImage = pygame.image.load('baddie.png')
-backgroundImage_StartScreen = pygame.image.load('forest.jpeg')
+backgroundImage_StartScreen = pygame.image.load('start.webp')
 bgImage_StartScreen = pygame.transform.scale(backgroundImage_StartScreen, (WINDOWWIDTH, WINDOWHEIGHT))
 
 # Show the "Start" screen.
 windowSurface.blit(bgImage_StartScreen, (0,0))
 #windowSurface.fill(BACKGROUNDCOLOR)
-drawText('Spooky Sprint', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 6))
-drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 3) - 30, (WINDOWHEIGHT / 6) + 60)
+drawText('Spooky Sprint', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 6))
+drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 2.5) - 30, (WINDOWHEIGHT / 6) + 60)
 pygame.display.update()
 waitForPlayerToPressKey()
 
