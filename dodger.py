@@ -15,20 +15,26 @@ ADDNEWBADDIERATE = 6
 PLAYERMOVERATE = 5
 
 class ObjectMagic:
-    def __init__(self, points):
+    def __init__(self, image_path, scale_size, points, y_position, speed):
+        self.image = pygame.image.load(image_path).convert_alpha()
+        self.image = pygame.transform.scale(self.image, scale_size)
+        self.rect = self.image.get_rect()
+        self.rect.y = y_position
+        self.rect.x = WINDOWWIDTH
         self.points = points
-        self.display = None
-        self.change_display()
+        self.speed = speed
 
-    def change_display(self):
-        if self.points == 10:
-            self.display = frogImage
-        elif self.points == 15:
-            self.display = birdImage
-        elif self.points == 20:
-            self.display = teapotImage
-        else:
-            self.display = None
+    def move_and_draw(self, surface):
+        self.rect.x -= self.speed # Déplacer l'objet vers la gauche
+        if self.rect.right < 0: # Si l'objet sort de l'écran, le remettre à droite
+            self.rect.x = WINDOWWIDTH
+        surface.blit(self.image, self.rect) # Afficher l'image de l'objet sur la surface
+
+    def check_collision(self, player_rect):
+        if player_rect.colliderect(self.rect): # Vérifier la collision avec le joueur
+            self.rect.x = WINDOWWIDTH # Réinitialiser la position de l'objet à droite de l'écran après la collision
+            return self.points  # Retourne les points pour ajouter au score
+        return 0  # Pas de collision, pas de points
 
 def terminate():
     pygame.quit()
@@ -78,10 +84,10 @@ playerRect = playerImages[0].get_rect() #CHANGEMENT
 baddieImage = pygame.image.load('baddie.png')
 backgroundImage = pygame.image.load('Wood.jpg').convert()
 bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
-birdImage = pygame.image.load('Bird.png').convert_alpha() 
-frogImage = pygame.image.load('Frog.png').convert_alpha()
-frogImage = pygame.transform.scale(frogImage, (100, 100))
-teapotImage = pygame.image.load('TeaPot.png').convert_alpha()
+#birdImage = pygame.image.load('Bird.png').convert_alpha() 
+#frogImage = pygame.image.load('Frog.png').convert_alpha()
+#frogImage = pygame.transform.scale(frogImage, (100, 100))
+#teapotImage = pygame.image.load('TeaPot.png').convert_alpha()
 
 # Show the "Start" screen.
 windowSurface.fill(BACKGROUNDCOLOR)
@@ -99,10 +105,13 @@ Speed = 5 # vitesse de défilement de l'arrière-plan
 bg_x = 0 # position de départ de l'arrière-plan
 
 # Set up ObjectMagic.
-frogRect = frogImage.get_rect() # obtenir dimension image
-frogRect.bottom = WINDOWHEIGHT # positionner en bas de la fenêtre
-frog_x = 0 # position initiale en x de frogImage alignée à gauche
-frogMagic = ObjectMagic(10)
+#frogRect = frogImage.get_rect() # obtenir dimension image
+#frogRect.bottom = WINDOWHEIGHT # positionner en bas de la fenêtre
+#frog_x = 0 # position initiale en x de frogImage alignée à gauche
+#frogMagic = ObjectMagic(10)
+frog = ObjectMagic('Frog.png', (50,50), 1000, WINDOWHEIGHT-50, Speed)
+bird = ObjectMagic('Bird.png', (50,50), 15, WINDOWHEIGHT-100, Speed)
+teapot = ObjectMagic('TeaPot.png', (50,50), 20, WINDOWHEIGHT-150, Speed)
 
 topScore = 0
 while True:
@@ -214,19 +223,26 @@ while True:
             bg_x = 0
 
         # Draw ObjectMagic.
-        windowSurface.blit(frogImage, (frog_x, frogRect.y))
-        frog_x -= Speed # déplacement frog vers la gauche avec le fond
+        #windowSurface.blit(frogImage, (frog_x, frogRect.y))
+        #frog_x -= Speed # déplacement frog vers la gauche avec le fond
 
-        if frog_x <= -frogRect.width:
-            frog_x = WINDOWWIDTH
+        #if frog_x <= -frogRect.width:
+            #frog_x = WINDOWWIDTH
         # Mettre a jour position de frogRect en fonction de frog_x.
-        frogRect.x = frog_x
-        frogRect.y = WINDOWHEIGHT - frogRect.height
+        #frogRect.x = frog_x
+        #frogRect.y = WINDOWHEIGHT - frogRect.height
         
         # Check if player has hit ObjectMagic.
-        if playerRect.colliderect(frogRect):
-            score += frogMagic.points
-            frog_x = WINDOWWIDTH
+        #if playerRect.colliderect(frogRect):
+            #score += frogMagic.points
+            #frog_x = WINDOWWIDTH
+        
+        # Draw ObjectMagic v2.
+        score += frog.check_collision(playerRect)
+        frog.move_and_draw(windowSurface)
+
+        score += bird.check_collision(playerRect)
+        bird.move_and_draw(windowSurface)
 
         # Draw the score and top score.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
