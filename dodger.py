@@ -70,6 +70,110 @@ drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 2.5) - 30,
 pygame.display.update()
 waitForPlayerToPressKey()
 
+#Question bonus
+# Configuration des constantes
+WINDOWWIDTH = 1200
+WINDOWHEIGHT = 600
+BACKGROUNDCOLOR = (255, 255, 255)  # Fond blanc
+TEXTCOLOR = (0, 0, 0)             # Texte noir
+INPUTBOXCOLOR = (255, 255, 255)   # Zone de texte blanche
+CORRECTANSWERS = ["31 october", "31st october", "october 31"]  # Réponses acceptées
+FONTSIZE = 40
+
+# Initialisation de Pygame
+pygame.init()
+windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+pygame.display.set_caption("Spooky Sprint")
+font = pygame.font.SysFont(None, FONTSIZE)
+
+# Chargement de l'image de fond
+backgroundImage_StartScreen = pygame.image.load('start.webp')
+bgImage_StartScreen = pygame.transform.scale(backgroundImage_StartScreen, (WINDOWWIDTH, WINDOWHEIGHT))
+
+def drawText(text, font, surface, x, y, color=TEXTCOLOR):
+    """Affiche du texte à une position donnée."""
+    textobj = font.render(text, True, color)
+    textrect = textobj.get_rect()
+    textrect.topleft = (x, y)
+    surface.blit(textobj, textrect)
+
+def questionScreen():
+    """Affiche une question avec une zone de réponse."""
+    input_text = ""  # Texte saisi par le joueur
+    question = "When is Halloween?"  # La question
+    score = 0  # Score initial
+
+    # Boucle pour afficher l'écran de question
+    while True:
+        windowSurface.blit(bgImage_StartScreen, (0, 0))  # Affiche l'image de fond
+
+        # Positionnement de la question et de la zone de texte
+        question_x = (WINDOWWIDTH - font.size(question)[0]) / 2
+        question_y = WINDOWHEIGHT / 3
+        input_box_x = (WINDOWWIDTH - 400) / 2  # Zone de saisie centrée (largeur 400)
+        input_box_y = question_y + 70
+
+        # Afficher la question
+        drawText(question, font, windowSurface, question_x, question_y)
+
+        # Dessiner la zone de texte
+        input_box = pygame.Rect(input_box_x, input_box_y, 400, 50)
+        pygame.draw.rect(windowSurface, INPUTBOXCOLOR, input_box)  # Fond blanc
+        pygame.draw.rect(windowSurface, TEXTCOLOR, input_box, 2)  # Bordure noire
+
+        # Afficher le texte saisi
+        drawText(input_text, font, windowSurface, input_box.x + 10, input_box.y + 10)
+
+        # Mettre à jour l'affichage
+        pygame.display.update()
+
+        # Gestion des événements
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_RETURN:  # Appui sur Entrée
+                    if input_text.lower() in CORRECTANSWERS:  # Vérifie la réponse
+                        score = 100
+                        return score
+                    else:
+                        drawText("Wrong Answer!", font, windowSurface, input_box_x, input_box_y + 80, (255, 0, 0))
+                        pygame.display.update()
+                        pygame.time.wait(2000)  # Pause pour afficher l'erreur
+                        return score  # Score reste à 0
+                elif event.key == K_BACKSPACE:  # Supprime un caractère
+                    input_text = input_text[:-1]
+                else:  # Ajoute du texte tapé
+                    input_text += event.unicode
+
+# Exemple d'utilisation
+score = questionScreen()
+print("Score du joueur:", score)
+
+# Écran de démarrage du jeu
+windowSurface.blit(bgImage_StartScreen, (0, 0))
+drawText('Spooky Sprint', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 6))
+drawText(f'Your starting score: {score}', font, windowSurface, (WINDOWWIDTH / 2.5) - 30, (WINDOWHEIGHT / 6) + 60)
+drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 2.5) - 30, (WINDOWHEIGHT / 6) + 120)
+pygame.display.update()
+
+# Attente d'une touche pour commencer
+while True:
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                pygame.quit()
+                sys.exit()
+            # Débuter la partie après la touche pressée
+            break
+    else:
+        continue
+    break
+
 topScore = 0
 while True:
     # Set up the start of the game.
