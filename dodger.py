@@ -2,7 +2,7 @@ import pygame, random, sys
 from pygame.locals import *
 
 ANIMATION_SPEED = 5  # CHANGEMENT Vitesse d'animation (nombre de frames avant de changer d'image)
-WINDOWWIDTH = 1500
+WINDOWWIDTH = 1200
 WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
 BACKGROUNDCOLOR = (255, 255, 255)
@@ -13,10 +13,10 @@ BADDIEMINSPEED = 1
 BADDIEMAXSPEED = 8
 ADDNEWBADDIERATE = 6
 PLAYERMOVERATE = 5
-TEXTCOLOR = (0, 0, 0)             # Texte noir
-INPUTBOXCOLOR = (255, 255, 255)   # Zone de texte blanche
-CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre"]  # Réponses acceptées
+INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
+CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre"] # Réponses acceptées
 FONTSIZE = 40
+NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
 
 def terminate():
     pygame.quit()
@@ -61,7 +61,6 @@ pygame.mixer.music.load('soundstart.mp3') # musique page accueil
 pygame.mixer.music.play(-1, 0.0) # -1 pour que la musique soit à l'infini
 
 # Set up images. CHANGEMENT
-NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
 playerImages = [pygame.transform.scale(pygame.image.load(f'player{i}.png'), NEW_PLAYER_SIZE) for i in range(1, 5)]
 playerIndex = 0  # Index de l'image courante pour l'animation
 playerRect = playerImages[0].get_rect() #CHANGEMENT
@@ -75,14 +74,10 @@ bgImage_StartScreen = pygame.transform.scale(backgroundImage_StartScreen, (WINDO
 
 # Show the "Start" screen.
 windowSurface.blit(bgImage_StartScreen, (0,0))
-#windowSurface.fill(BACKGROUNDCOLOR)
 drawText('Spooky Sprint', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 6))
 drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 2.5) - 30, (WINDOWHEIGHT / 6) + 60)
 pygame.display.update()
 waitForPlayerToPressKey()
-
-playerIndex = 0  # CHANGEMENT Index de l'image actuelle pour l'animation
-animationCounter = 0  # CHANGEMENT Compteur pour contrôler la vitesse d'animation
 
 playerIndex = 0  # CHANGEMENT Index de l'image actuelle pour l'animation
 animationCounter = 0  # CHANGEMENT Compteur pour contrôler la vitesse d'animation
