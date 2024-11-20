@@ -19,18 +19,70 @@ GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les enne
 # Classe Baddie
 class Baddie:
     def __init__(self, images, min_size, max_size, min_speed, max_speed):
-        self.size = random.randint(min_size, max_size)
+        # Définir les types de baddies et leurs images spécifiques
+        baddie_types = {
+            'baddie1': images[0],  # baddie1.png
+            'baddie2': images[1],  # baddie2.png
+            'baddie3': images[2],  # baddie3.png
+            'baddie4': images[3],  # baddie4.png
+        }
+
+        # Choisir un type de baddie spécifique
+        self.baddie_type = random.choice(list(baddie_types.keys()))
         self.image = pygame.transform.scale(
-            random.choice(images), (self.size, self.size)
+            baddie_types[self.baddie_type],
+            (random.randint(min_size, max_size), random.randint(min_size, max_size))
         )
         self.speed = random.randint(min_speed, max_speed)
-        self.rect = pygame.Rect(WINDOWWIDTH, GROUND_LEVEL - self.size, self.size, self.size)
+
+        # Initialiser la position selon le type
+        if self.baddie_type in ['baddie1', 'baddie2']:
+            # Mouvement horizontal au sol
+            self.rect = pygame.Rect(
+                WINDOWWIDTH, 
+                GROUND_LEVEL - self.image.get_height(),
+                self.image.get_width(),
+                self.image.get_height()
+            )
+        elif self.baddie_type == 'baddie3':
+            # Mouvement volant
+            self.rect = pygame.Rect(
+                WINDOWWIDTH, 
+                random.randint(50, GROUND_LEVEL - 100),
+                self.image.get_width(),
+                self.image.get_height()
+            )
+            self.vertical_speed = random.choice([-2, 2])  # Oscillation verticale
+        elif self.baddie_type == 'baddie4':
+            # Mouvement tombant
+            self.rect = pygame.Rect(
+                random.randint(0, WINDOWWIDTH - self.image.get_width()), 
+                -self.image.get_height(),
+                self.image.get_width(),
+                self.image.get_height()
+            )
 
     def move(self):
-        self.rect.move_ip(-self.speed, 0)
+        # Mouvement défini par le type
+        if self.baddie_type in ['baddie1', 'baddie2']:
+            # Mouvement horizontal classique (droite → gauche au sol)
+            self.rect.move_ip(-self.speed, 0)
+        elif self.baddie_type == 'baddie3':
+            # Mouvement volant avec oscillation verticale
+            self.rect.move_ip(-self.speed, self.vertical_speed)
+            # Inverser la direction verticale si nécessaire
+            if self.rect.top <= 0 or self.rect.bottom >= GROUND_LEVEL - 50:
+                self.vertical_speed *= -1
+        elif self.baddie_type == 'baddie4':
+            # Mouvement vertical (chute)
+            self.rect.move_ip(0, self.speed)
 
     def is_off_screen(self):
-        return self.rect.right < 0
+        # Vérifier si le *baddie* est hors de l'écran
+        return (
+            self.rect.right < 0 or
+            (self.baddie_type == 'baddie4' and self.rect.top > WINDOWHEIGHT)
+        ) 
     
 def terminate():
     pygame.quit()
@@ -147,6 +199,7 @@ while True:
             baddieAddCounter += 1
         if baddieAddCounter == ADDNEWBADDIERATE:
             baddieAddCounter = 0
+            # Génère un baddie avec un type aléatoire
             baddies.append(Baddie(baddie_images, BADDIEMINSIZE, BADDIEMAXSIZE, BADDIEMINSPEED, BADDIEMAXSPEED))
 
         # Move the player around.
