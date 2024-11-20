@@ -12,6 +12,10 @@ BADDIEMINSPEED = 1
 BADDIEMAXSPEED = 8
 ADDNEWBADDIERATE = 6
 PLAYERMOVERATE = 5
+TEXTCOLOR = (0, 0, 0)             # Texte noir
+INPUTBOXCOLOR = (255, 255, 255)   # Zone de texte blanche
+CORRECTANSWERS = ["31 october", "31st october", "october 31"]  # Réponses acceptées
+FONTSIZE = 40
 
 def terminate():
     pygame.quit()
@@ -71,15 +75,6 @@ pygame.display.update()
 waitForPlayerToPressKey()
 
 #Question bonus
-# Configuration des constantes
-WINDOWWIDTH = 1200
-WINDOWHEIGHT = 600
-BACKGROUNDCOLOR = (255, 255, 255)  # Fond blanc
-TEXTCOLOR = (0, 0, 0)             # Texte noir
-INPUTBOXCOLOR = (255, 255, 255)   # Zone de texte blanche
-CORRECTANSWERS = ["31 october", "31st october", "october 31"]  # Réponses acceptées
-FONTSIZE = 40
-
 # Initialisation de Pygame
 pygame.init()
 windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
@@ -178,7 +173,6 @@ topScore = 0
 while True:
     # Set up the start of the game.
     baddies = []
-    score = 0
     playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)
     moveLeft = moveRight = moveUp = moveDown = False
     reverseCheat = slowCheat = False
