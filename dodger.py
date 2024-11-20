@@ -14,7 +14,7 @@ ADDNEWBADDIERATE = 6
 PLAYERMOVERATE = 5
 TEXTCOLOR = (0, 0, 0)             # Texte noir
 INPUTBOXCOLOR = (255, 255, 255)   # Zone de texte blanche
-CORRECTANSWERS = ["31 october", "31st october", "october 31"]  # Réponses acceptées
+CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre"]  # Réponses acceptées
 FONTSIZE = 40
 
 def terminate():
