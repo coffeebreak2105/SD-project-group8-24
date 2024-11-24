@@ -246,12 +246,13 @@ while True:
             if playerRect.colliderect(teapot.rect):
                 score += teapot.points
                 teapot.rect.x = WINDOWWIDTH
+        # Passage au level suivant
         if score >= 1000 * level:
             level += 1
             if level > 3:
                 level = 1
 
-        # Draw the score and top score.
+        # Draw the score, top score, level.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
         drawText('Top Score: %s' % (topScore), font, windowSurface, 10, 40)
         drawText('Level: %s' % (level), font, windowSurface, WINDOWWIDTH - 200, 10)
