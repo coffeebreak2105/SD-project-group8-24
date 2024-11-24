@@ -84,10 +84,6 @@ playerRect = playerImages[0].get_rect() #CHANGEMENT
 baddieImage = pygame.image.load('baddie.png')
 backgroundImage = pygame.image.load('Wood.jpg').convert()
 bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
-#birdImage = pygame.image.load('Bird.png').convert_alpha() 
-#frogImage = pygame.image.load('Frog.png').convert_alpha()
-#frogImage = pygame.transform.scale(frogImage, (100, 100))
-#teapotImage = pygame.image.load('TeaPot.png').convert_alpha()
 
 # Show the "Start" screen.
 windowSurface.fill(BACKGROUNDCOLOR)
@@ -105,18 +101,19 @@ Speed = 5 # vitesse de défilement de l'arrière-plan
 bg_x = 0 # position de départ de l'arrière-plan
 
 # Set up ObjectMagic.
-#frogRect = frogImage.get_rect() # obtenir dimension image
-#frogRect.bottom = WINDOWHEIGHT # positionner en bas de la fenêtre
-#frog_x = 0 # position initiale en x de frogImage alignée à gauche
-#frogMagic = ObjectMagic(10)
-frog = ObjectMagic('Frog.png', (50,50), 1000, WINDOWHEIGHT-50, Speed)
-bird = ObjectMagic('Bird.png', (50,50), 15, WINDOWHEIGHT-100, Speed)
-teapot = ObjectMagic('TeaPot.png', (50,50), 20, WINDOWHEIGHT-150, Speed)
+frog = ObjectMagic('Frog.png', (50,50), 200, WINDOWHEIGHT-50, Speed)
+bird = ObjectMagic('Bird.png', (50,50), 300, WINDOWHEIGHT-50, Speed)
+teapot = ObjectMagic('TeaPot.png', (50,50), 500, WINDOWHEIGHT-50, Speed)
+# Initialiser position horizontale pour chaque objet
+frog.rect.x = WINDOWWIDTH
+bird.rect.x = WINDOWWIDTH
+teapot.rect.x = WINDOWWIDTH
 
 topScore = 0
 while True:
     # Set up the start of the game.
     baddies = []
+    level = 1
     score = 0
     playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)
     moveLeft = moveRight = moveUp = moveDown = False
@@ -221,32 +218,43 @@ while True:
 
         if bg_x <= -WINDOWWIDTH:
             bg_x = 0
-
-        # Draw ObjectMagic.
-        #windowSurface.blit(frogImage, (frog_x, frogRect.y))
-        #frog_x -= Speed # déplacement frog vers la gauche avec le fond
-
-        #if frog_x <= -frogRect.width:
-            #frog_x = WINDOWWIDTH
-        # Mettre a jour position de frogRect en fonction de frog_x.
-        #frogRect.x = frog_x
-        #frogRect.y = WINDOWHEIGHT - frogRect.height
         
-        # Check if player has hit ObjectMagic.
-        #if playerRect.colliderect(frogRect):
-            #score += frogMagic.points
-            #frog_x = WINDOWWIDTH
-        
-        # Draw ObjectMagic v2.
-        score += frog.check_collision(playerRect)
-        frog.move_and_draw(windowSurface)
-
-        score += bird.check_collision(playerRect)
-        bird.move_and_draw(windowSurface)
+        # Draw ObjectMagic with levels.
+        if level == 1:
+            # Déplacement de l'objet frog
+            windowSurface.blit(frog.image, (frog.rect.x, frog.rect.y))
+            frog.rect.x -= frog.speed
+            if frog.rect.x <= -frog.rect.width:
+                frog.rect.x = WINDOWWIDTH
+            # Vérification collision player et objet magique
+            if playerRect.colliderect(frog.rect):
+                score += frog.points
+                frog.rect.x = WINDOWWIDTH
+        elif level == 2:
+            windowSurface.blit(bird.image, (bird.rect.x, bird.rect.y))
+            bird.rect.x -= bird.speed
+            if bird.rect.x <= -bird.rect.width:
+                bird.rect.x = WINDOWWIDTH
+            if playerRect.colliderect(bird.rect):
+                score += bird.points
+                bird.rect.x = WINDOWWIDTH
+        elif level == 3:
+            windowSurface.blit(teapot.image, (teapot.rect.x, teapot.rect.y))
+            teapot.rect.x -= teapot.speed
+            if teapot.rect.x <= -teapot.rect.width:
+                teapot.rect.x = WINDOWWIDTH
+            if playerRect.colliderect(teapot.rect):
+                score += teapot.points
+                teapot.rect.x = WINDOWWIDTH
+        if score >= 1000 * level:
+            level += 1
+            if level > 3:
+                level = 1
 
         # Draw the score and top score.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
         drawText('Top Score: %s' % (topScore), font, windowSurface, 10, 40)
+        drawText('Level: %s' % (level), font, windowSurface, WINDOWWIDTH - 200, 10)
 
         # Draw the player's rectangle.
         windowSurface.blit(playerImages[playerIndex], playerRect) #CHANGEMENT
