@@ -82,8 +82,13 @@ playerImages = [pygame.transform.scale(pygame.image.load(f'player{i}.png'), NEW_
 playerIndex = 0  # Index de l'image courante pour l'animation
 playerRect = playerImages[0].get_rect() #CHANGEMENT
 baddieImage = pygame.image.load('baddie.png')
-backgroundImage = pygame.image.load('Wood.jpg').convert()
-bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
+#backgroundImage = pygame.image.load('Wood.jpg').convert()
+#bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
+backgrounds = { 
+    1: pygame.transform.scale(pygame.image.load('Wood.jpg').convert(), (WINDOWWIDTH, WINDOWHEIGHT)),
+    2: pygame.transform.scale(pygame.image.load('Wood2.jpg').convert(), (WINDOWWIDTH, WINDOWHEIGHT)),
+    3: pygame.transform.scale(pygame.image.load('Wood3.jpg').convert(), (WINDOWWIDTH, WINDOWHEIGHT)),
+}
 
 # Show the "Start" screen.
 windowSurface.fill(BACKGROUNDCOLOR)
@@ -212,6 +217,7 @@ while True:
                 baddies.remove(b)
 
         # Draw scrolling background
+        bgImage = backgrounds[level] # définir background selon level
         windowSurface.blit(bgImage, (bg_x, 0))
         windowSurface.blit(bgImage, (bg_x + WINDOWWIDTH, 0))
         bg_x -= Speed # déplacer arrière-plan vers la gauche
