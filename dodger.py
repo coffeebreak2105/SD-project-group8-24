@@ -17,20 +17,17 @@ INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
 CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre"] # Réponses acceptées
 FONTSIZE = 40
 NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
-
-
-# Ajoutez une variable globale pour les vies
 LIVES = 3  # Nombre initial de vies # MODIFICATION
-
-# Charger l'image des cœurs # MODIFICATION
 HEART_SIZE = (50, 50)  # Taille des cœurs
-heartImage = pygame.image.load('heart.png')  # Image de cœur
-heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
-
-
 JUMPSPEED = 15
 GRAVITY = 1
 GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
+NEW_PLAYER_SIZE = (220, 220)  # Taille souhaitée pour le joueur
+
+# Charger l'image des cœurs # MODIFICATION
+heartImage = pygame.image.load('heart.png')  # Image de cœur
+heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
+
 
 # Classe Baddie
 class Baddie:
@@ -145,22 +142,21 @@ font = pygame.font.SysFont(None, 48) # taille 48 pour le texte
 
 # Set up sounds.
 gameOverSound = pygame.mixer.Sound('gameover.wav')
-pygame.mixer.music.load('background.mid')
+pygame.mixer.music.load('background.mid') # à effacer?
 pygame.mixer.music.load('soundstart.mp3') # musique page accueil
 pygame.mixer.music.play(-1, 0.0) # -1 pour que la musique soit à l'infini
 
 # Set up images. CHANGEMENT
 # Charger les images des joueurs et retirer le fond blanc
-NEW_PLAYER_SIZE = (220, 220)  # Taille souhaitée pour le joueur
 playerImages = []
 for i in range(1, 5):
     image = pygame.image.load(f'player{i}.png').convert()  # Charger l'image
     image.set_colorkey((0, 0, 0))  # Rendre le fond noir transparent
     image = pygame.transform.scale(image, NEW_PLAYER_SIZE)  # Redimensionner
     playerImages.append(image)
-
-playerIndex = 0  # Index de l'image courante pour l'animation
 playerRect = playerImages[0].get_rect() #CHANGEMENT
+heartImage = pygame.image.load('heart.png')  # Image de cœur
+heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
 backgroundImage = pygame.image.load('Wood.jpg').convert()
 bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
 Speed = 5 # vitesse de défilement de l'arrière-plan
