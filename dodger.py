@@ -24,10 +24,6 @@ GRAVITY = 1
 GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
 NEW_PLAYER_SIZE = (220, 220)  # Taille souhaitée pour le joueur
 
-# Charger l'image des cœurs # MODIFICATION
-heartImage = pygame.image.load('heart.png')  # Image de cœur
-heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
-
 
 # Classe Baddie
 class Baddie:
