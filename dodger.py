@@ -1,7 +1,8 @@
 import pygame, random, sys
 from pygame.locals import *
 
-WINDOWWIDTH = 600
+ANIMATION_SPEED = 5  # CHANGEMENT Vitesse d'animation (nombre de frames avant de changer d'image)
+WINDOWWIDTH = 1200
 WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
 BACKGROUNDCOLOR = (255, 255, 255)
@@ -12,6 +13,21 @@ BADDIEMINSPEED = 2
 BADDIEMAXSPEED = 5
 ADDNEWBADDIERATE = 40 # Fréquence d'apparition des ennemis
 PLAYERMOVERATE = 5
+INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
+CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre"] # Réponses acceptées
+FONTSIZE = 40
+NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
+
+
+# Ajoutez une variable globale pour les vies
+LIVES = 3  # Nombre initial de vies # MODIFICATION
+
+# Charger l'image des cœurs # MODIFICATION
+HEART_SIZE = (50, 50)  # Taille des cœurs
+heartImage = pygame.image.load('heart.png')  # Image de cœur
+heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
+
+
 JUMPSPEED = 15
 GRAVITY = 1
 GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
@@ -110,24 +126,47 @@ def drawText(text, font, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
+#Fonction pour afficher les coeurs
+def drawHearts(surface, lives, heartImage, start_x, start_y):
+    """Affiche les cœurs en fonction des vies restantes à une position donnée."""
+    for i in range(lives):
+        surface.blit(heartImage, (start_x + i * (HEART_SIZE[0] + 5), start_y))
+
+          
 # Set up pygame, the window, and the mouse cursor.
 pygame.init()
 mainClock = pygame.time.Clock()
 windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-pygame.display.set_caption('Dodger')
+pygame.display.set_caption('Spooky Sprint')
 pygame.mouse.set_visible(False)
 
 # Set up the fonts.
-font = pygame.font.SysFont(None, 48)
+font = pygame.font.SysFont(None, 48) # taille 48 pour le texte
 
 # Set up sounds.
 gameOverSound = pygame.mixer.Sound('gameover.wav')
 pygame.mixer.music.load('background.mid')
+pygame.mixer.music.load('soundstart.mp3') # musique page accueil
+pygame.mixer.music.play(-1, 0.0) # -1 pour que la musique soit à l'infini
 
-# Set up images.
-playerImage = pygame.image.load('player.png')
-playerRect = playerImage.get_rect()
+# Set up images. CHANGEMENT
+# Charger les images des joueurs et retirer le fond blanc
+NEW_PLAYER_SIZE = (220, 220)  # Taille souhaitée pour le joueur
+playerImages = []
+for i in range(1, 5):
+    image = pygame.image.load(f'player{i}.png').convert()  # Charger l'image
+    image.set_colorkey((0, 0, 0))  # Rendre le fond noir transparent
+    image = pygame.transform.scale(image, NEW_PLAYER_SIZE)  # Redimensionner
+    playerImages.append(image)
 
+playerIndex = 0  # Index de l'image courante pour l'animation
+playerRect = playerImages[0].get_rect() #CHANGEMENT
+backgroundImage = pygame.image.load('Wood.jpg').convert()
+bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
+Speed = 5 # vitesse de défilement de l'arrière-plan
+bg_x = 0 # position de départ de l'arrière-plan
+backgroundImage_StartScreen = pygame.image.load('start.webp')
+bgImage_StartScreen = pygame.transform.scale(backgroundImage_StartScreen, (WINDOWWIDTH, WINDOWHEIGHT))
 # Images pour les ennemis
 baddie_images = [
     pygame.image.load('baddie1.png'),
@@ -137,11 +176,109 @@ baddie_images = [
 ]
 
 # Show the "Start" screen.
-windowSurface.fill(BACKGROUNDCOLOR)
-drawText('Dodger', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
-drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 3) - 30, (WINDOWHEIGHT / 3) + 50)
+windowSurface.blit(bgImage_StartScreen, (0,0))
+drawText('Spooky Sprint', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 6))
+drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 2.5) - 30, (WINDOWHEIGHT / 6) + 60)
 pygame.display.update()
 waitForPlayerToPressKey()
+
+playerIndex = 0  # CHANGEMENT Index de l'image actuelle pour l'animation
+animationCounter = 0  # CHANGEMENT Compteur pour contrôler la vitesse d'animation
+
+#Question bonus
+# Initialisation de Pygame
+pygame.init()
+windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+pygame.display.set_caption("Spooky Sprint")
+font = pygame.font.SysFont(None, FONTSIZE)
+
+# Chargement de l'image de fond
+backgroundImage_StartScreen = pygame.image.load('start.webp')
+bgImage_StartScreen = pygame.transform.scale(backgroundImage_StartScreen, (WINDOWWIDTH, WINDOWHEIGHT))
+
+def drawText(text, font, surface, x, y, color=TEXTCOLOR):
+    """Affiche du texte à une position donnée."""
+    textobj = font.render(text, True, color)
+    textrect = textobj.get_rect()
+    textrect.topleft = (x, y)
+    surface.blit(textobj, textrect)
+
+def questionScreen():
+    """Affiche une question avec une zone de réponse."""
+    input_text = ""  # Texte saisi par le joueur
+    question = "When is Halloween?"  # La question
+    score = 0  # Score initial
+
+    # Boucle pour afficher l'écran de question
+    while True:
+        windowSurface.blit(bgImage_StartScreen, (0, 0))  # Affiche l'image de fond
+
+        # Positionnement de la question et de la zone de texte
+        question_x = (WINDOWWIDTH - font.size(question)[0]) / 2
+        question_y = WINDOWHEIGHT / 3
+        input_box_x = (WINDOWWIDTH - 400) / 2  # Zone de saisie centrée (largeur 400)
+        input_box_y = question_y + 70
+
+        # Afficher la question
+        drawText(question, font, windowSurface, question_x, question_y)
+
+        # Dessiner la zone de texte
+        input_box = pygame.Rect(input_box_x, input_box_y, 400, 50)
+        pygame.draw.rect(windowSurface, INPUTBOXCOLOR, input_box)  # Fond blanc
+        pygame.draw.rect(windowSurface, TEXTCOLOR, input_box, 2)  # Bordure noire
+
+        # Afficher le texte saisi
+        drawText(input_text, font, windowSurface, input_box.x + 10, input_box.y + 10)
+
+        # Mettre à jour l'affichage
+        pygame.display.update()
+
+        # Gestion des événements
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_RETURN:  # Appui sur Entrée
+                    if input_text.lower() in CORRECTANSWERS:  # Vérifie la réponse
+                        score = 100
+                        return score
+                    else:
+                        drawText("Wrong Answer!", font, windowSurface, input_box_x, input_box_y + 80, (255, 0, 0))
+                        pygame.display.update()
+                        pygame.time.wait(2000)  # Pause pour afficher l'erreur
+                        return score  # Score reste à 0
+                elif event.key == K_BACKSPACE:  # Supprime un caractère
+                    input_text = input_text[:-1]
+                else:  # Ajoute du texte tapé
+                    input_text += event.unicode
+
+# Exemple d'utilisation
+score = questionScreen()
+print("Score du joueur:", score)
+
+# Écran de démarrage du jeu
+windowSurface.blit(bgImage_StartScreen, (0, 0))
+drawText('Spooky Sprint', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 6))
+drawText(f'Your starting score: {score}', font, windowSurface, (WINDOWWIDTH / 2.5) - 30, (WINDOWHEIGHT / 6) + 60)
+drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 2.5) - 30, (WINDOWHEIGHT / 6) + 120)
+pygame.display.update()
+
+# Attente d'une touche pour commencer
+while True:
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                pygame.quit()
+                sys.exit()
+            # Débuter la partie après la touche pressée
+            break
+    else:
+        continue
+    break
 
 topScore = 0
 while True:
@@ -154,6 +291,7 @@ while True:
     isJumping = False
     jumpSpeed = JUMPSPEED  # Initial jump speed
     baddieAddCounter = 0
+    lives = LIVES  # Initialiser les vies pour chaque nouvelle partie # MODIFICATION
     pygame.mixer.music.play(-1, 0.0)
 
     while True: # The game loop runs while the game part is playing.
@@ -219,6 +357,13 @@ while True:
                 isJumping = False
                 jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
 
+        
+        # Update player animation CHANGEMENT
+        animationCounter += 1
+        if animationCounter >= ANIMATION_SPEED:
+            animationCounter = 0
+            playerIndex = (playerIndex + 1) % len(playerImages)  # Passer à l'image suivante en boucle
+
         # Move the baddies to the left across the bottom of the screen.
         for b in baddies:
             if not reverseCheat and not slowCheat:
@@ -228,30 +373,49 @@ while True:
             elif slowCheat:
                 b.rect.move_ip(-1, 0) # Move left slowly if slow cheat is active
 
-  # Delete baddies that have gone off the left side of the screen.
+        # Delete baddies that have gone off the left side of the screen.
         baddies = [b for b in baddies if not b.is_off_screen()]
 
-        # Draw the game world on the window.
-        windowSurface.fill(BACKGROUNDCOLOR)
+        # Draw scrolling background
+        windowSurface.blit(bgImage, (bg_x, 0))
+        windowSurface.blit(bgImage, (bg_x + WINDOWWIDTH, 0))
+        bg_x -= Speed # déplacer arrière-plan vers la gauche
+
+        if bg_x <= -WINDOWWIDTH:
+            bg_x = 0       
 
         # Draw the score and top score.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
         drawText('Top Score: %s' % (topScore), font, windowSurface, 10, 40)
+        top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte) #MODIFICATION Affichage des coeurs
+        drawHearts(windowSurface, lives, heartImage, 10, top_score_y)
 
         # Draw the player's rectangle.
-        windowSurface.blit(playerImage, playerRect)
+        windowSurface.blit(playerImages[playerIndex], playerRect) #CHANGEMENT
 
         # Draw each baddie.
         for b in baddies:
             windowSurface.blit(b.image, b.rect)
+            
+
+        # Afficher les cœurs restants MODIFICATION
+        top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte)
+        drawHearts(windowSurface, lives, heartImage, 10, top_score_y)
+
 
         pygame.display.update()
 
         # Check if any of the baddies have hit the player.
         if playerHasHitBaddie(playerRect, baddies):
-            if score > topScore:
-                topScore = score # set new top score
-            break
+            lives -= 1  # Réduire les vies # MODIFICATION
+            if lives <= 0:  # Si plus de vies, fin du jeu # MODIFICATION
+                if score > topScore:
+                    topScore = score  # set new top score
+                break
+            else:
+                # Réinitialisez la position du joueur
+                playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)  # MODIFICATION
+                baddies = []  # Réinitialisez les baddies # MODIFICATION
 
         mainClock.tick(FPS)
 
