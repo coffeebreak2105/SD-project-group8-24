@@ -7,11 +7,11 @@ WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
 BACKGROUNDCOLOR = (255, 255, 255)
 FPS = 60
-BADDIEMINSIZE = 10
-BADDIEMAXSIZE = 40
-BADDIEMINSPEED = 1
-BADDIEMAXSPEED = 8
-ADDNEWBADDIERATE = 6
+BADDIEMINSIZE = 30
+BADDIEMAXSIZE = 50
+BADDIEMINSPEED = 2
+BADDIEMAXSPEED = 5
+ADDNEWBADDIERATE = 40 # Fréquence d'apparition des ennemis
 PLAYERMOVERATE = 5
 INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
 CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre"] # Réponses acceptées
@@ -28,6 +28,78 @@ heartImage = pygame.image.load('heart.png')  # Image de cœur
 heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
 
 
+JUMPSPEED = 15
+GRAVITY = 1
+GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
+
+# Classe Baddie
+class Baddie:
+    def __init__(self, images, min_size, max_size, min_speed, max_speed):
+        # Définir les types de baddies et leurs images spécifiques
+        baddie_types = {
+            'baddie1': images[0],  # baddie1.png
+            'baddie2': images[1],  # baddie2.png
+            'baddie3': images[2],  # baddie3.png
+            'baddie4': images[3],  # baddie4.png
+        }
+
+        # Choisir un type de baddie spécifique
+        self.baddie_type = random.choice(list(baddie_types.keys()))
+        self.image = pygame.transform.scale(
+            baddie_types[self.baddie_type],
+            (random.randint(min_size, max_size), random.randint(min_size, max_size))
+        )
+        self.speed = random.randint(min_speed, max_speed)
+
+        # Initialiser la position selon le type
+        if self.baddie_type in ['baddie1', 'baddie2']:
+            # Mouvement horizontal au sol
+            self.rect = pygame.Rect(
+                WINDOWWIDTH, 
+                GROUND_LEVEL - self.image.get_height(),
+                self.image.get_width(),
+                self.image.get_height()
+            )
+        elif self.baddie_type == 'baddie3':
+            # Mouvement volant
+            self.rect = pygame.Rect(
+                WINDOWWIDTH, 
+                random.randint(50, GROUND_LEVEL - 100),
+                self.image.get_width(),
+                self.image.get_height()
+            )
+            self.vertical_speed = random.choice([-2, 2])  # Oscillation verticale
+        elif self.baddie_type == 'baddie4':
+            # Mouvement tombant
+            self.rect = pygame.Rect(
+                random.randint(0, WINDOWWIDTH - self.image.get_width()), 
+                -self.image.get_height(),
+                self.image.get_width(),
+                self.image.get_height()
+            )
+
+    def move(self):
+        # Mouvement défini par le type
+        if self.baddie_type in ['baddie1', 'baddie2']:
+            # Mouvement horizontal classique (droite → gauche au sol)
+            self.rect.move_ip(-self.speed, 0)
+        elif self.baddie_type == 'baddie3':
+            # Mouvement volant avec oscillation verticale
+            self.rect.move_ip(-self.speed, self.vertical_speed)
+            # Inverser la direction verticale si nécessaire
+            if self.rect.top <= 0 or self.rect.bottom >= GROUND_LEVEL - 50:
+                self.vertical_speed *= -1
+        elif self.baddie_type == 'baddie4':
+            # Mouvement vertical (chute)
+            self.rect.move_ip(0, self.speed)
+
+    def is_off_screen(self):
+        # Vérifier si le *baddie* est hors de l'écran
+        return (
+            self.rect.right < 0 or
+            (self.baddie_type == 'baddie4' and self.rect.top > WINDOWHEIGHT)
+        ) 
+    
 def terminate():
     pygame.quit()
     sys.exit()
@@ -44,7 +116,7 @@ def waitForPlayerToPressKey():
 
 def playerHasHitBaddie(playerRect, baddies):
     for b in baddies:
-        if playerRect.colliderect(b['rect']):
+        if playerRect.colliderect(b.rect):
             return True
     return False
 
@@ -89,13 +161,19 @@ for i in range(1, 5):
 
 playerIndex = 0  # Index de l'image courante pour l'animation
 playerRect = playerImages[0].get_rect() #CHANGEMENT
-baddieImage = pygame.image.load('baddie.png')
 backgroundImage = pygame.image.load('Wood.jpg').convert()
 bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
 Speed = 5 # vitesse de défilement de l'arrière-plan
 bg_x = 0 # position de départ de l'arrière-plan
 backgroundImage_StartScreen = pygame.image.load('start.webp')
 bgImage_StartScreen = pygame.transform.scale(backgroundImage_StartScreen, (WINDOWWIDTH, WINDOWHEIGHT))
+# Images pour les ennemis
+baddie_images = [
+    pygame.image.load('baddie1.png'),
+    pygame.image.load('baddie2.png'),
+    pygame.image.load('baddie3.png'),
+    pygame.image.load('baddie4.png'),
+]
 
 # Show the "Start" screen.
 windowSurface.blit(bgImage_StartScreen, (0,0))
@@ -206,9 +284,12 @@ topScore = 0
 while True:
     # Set up the start of the game.
     baddies = []
-    playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)
-    moveLeft = moveRight = moveUp = moveDown = False
+    score = 0
+    playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL -playerRect.height)
+    moveLeft = moveRight = False
     reverseCheat = slowCheat = False
+    isJumping = False
+    jumpSpeed = JUMPSPEED  # Initial jump speed
     baddieAddCounter = 0
     lives = LIVES  # Initialiser les vies pour chaque nouvelle partie # MODIFICATION
     pygame.mixer.music.play(-1, 0.0)
@@ -231,12 +312,9 @@ while True:
                 if event.key == K_RIGHT or event.key == K_d:
                     moveLeft = False
                     moveRight = True
-                if event.key == K_UP or event.key == K_w:
-                    moveDown = False
-                    moveUp = True
-                if event.key == K_DOWN or event.key == K_s:
-                    moveUp = False
-                    moveDown = True
+                if event.key == K_SPACE and not isJumping:
+                    isJumping = True  # Start the jump
+                    jumpSpeed = JUMPSPEED  # Reset jump speed for the jump
 
             if event.type == KEYUP:
                 if event.key == K_z:
@@ -252,56 +330,51 @@ while True:
                     moveLeft = False
                 if event.key == K_RIGHT or event.key == K_d:
                     moveRight = False
-                if event.key == K_UP or event.key == K_w:
-                    moveUp = False
-                if event.key == K_DOWN or event.key == K_s:
-                    moveDown = False
 
-            if event.type == MOUSEMOTION:
-                # If the mouse moves, move the player where to the cursor.
-                playerRect.centerx = event.pos[0]
-                playerRect.centery = event.pos[1]
-        # Add new baddies at the top of the screen, if needed.
+
+        # Add new baddies from the right side at the bottom of the screen.
         if not reverseCheat and not slowCheat:
             baddieAddCounter += 1
         if baddieAddCounter == ADDNEWBADDIERATE:
             baddieAddCounter = 0
-            baddieSize = random.randint(BADDIEMINSIZE, BADDIEMAXSIZE)
-            newBaddie = {'rect': pygame.Rect(random.randint(0, WINDOWWIDTH - baddieSize), 0 - baddieSize, baddieSize, baddieSize),
-                        'speed': random.randint(BADDIEMINSPEED, BADDIEMAXSPEED),
-                        'surface':pygame.transform.scale(baddieImage, (baddieSize, baddieSize)),
-                        }
-
-            baddies.append(newBaddie)
+            # Génère un baddie avec un type aléatoire
+            baddies.append(Baddie(baddie_images, BADDIEMINSIZE, BADDIEMAXSIZE, BADDIEMINSPEED, BADDIEMAXSPEED))
 
         # Move the player around.
         if moveLeft and playerRect.left > 0:
             playerRect.move_ip(-1 * PLAYERMOVERATE, 0)
         if moveRight and playerRect.right < WINDOWWIDTH:
             playerRect.move_ip(PLAYERMOVERATE, 0)
-        if moveUp and playerRect.top > 0:
-            playerRect.move_ip(0, -1 * PLAYERMOVERATE)
-        if moveDown and playerRect.bottom < WINDOWHEIGHT:
-            playerRect.move_ip(0, PLAYERMOVERATE)
- # Update player animation CHANGEMENT
+        
+        # Handle jumping
+        if isJumping:
+            playerRect.move_ip(0, -jumpSpeed)  # Move up initially
+            jumpSpeed -= GRAVITY  # Gravity effect
+
+            # If the player lands on the ground
+            if playerRect.bottom >= GROUND_LEVEL:
+                playerRect.bottom = GROUND_LEVEL
+                isJumping = False
+                jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
+
+        
+        # Update player animation CHANGEMENT
         animationCounter += 1
         if animationCounter >= ANIMATION_SPEED:
             animationCounter = 0
             playerIndex = (playerIndex + 1) % len(playerImages)  # Passer à l'image suivante en boucle
 
-        # Move the baddies down.
+        # Move the baddies to the left across the bottom of the screen.
         for b in baddies:
             if not reverseCheat and not slowCheat:
-                b['rect'].move_ip(0, b['speed'])
+                b.move()  # Move left
             elif reverseCheat:
-                b['rect'].move_ip(0, -5)
+                b.rect.move_ip(5, 0) # Move right if reverse cheat is active
             elif slowCheat:
-                b['rect'].move_ip(0, 1)
+                b.rect.move_ip(-1, 0) # Move left slowly if slow cheat is active
 
-        # Delete baddies that have fallen past the bottom.
-        for b in baddies[:]:
-            if b['rect'].top > WINDOWHEIGHT:
-                baddies.remove(b)
+        # Delete baddies that have gone off the left side of the screen.
+        baddies = [b for b in baddies if not b.is_off_screen()]
 
         # Draw scrolling background
         windowSurface.blit(bgImage, (bg_x, 0))
@@ -322,7 +395,8 @@ while True:
 
         # Draw each baddie.
         for b in baddies:
-            windowSurface.blit(b['surface'], b['rect'])
+            windowSurface.blit(b.image, b.rect)
+            
 
         # Afficher les cœurs restants MODIFICATION
         top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte)
