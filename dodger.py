@@ -4,7 +4,7 @@ from pygame.locals import *
 ANIMATION_SPEED = 5  # CHANGEMENT Vitesse d'animation (nombre de frames avant de changer d'image)
 WINDOWWIDTH = 1200
 WINDOWHEIGHT = 600
-TEXTCOLOR = (0, 0, 0) # utile?
+TEXTCOLOR = (0, 0, 0)
 BACKGROUNDCOLOR = (255, 255, 255)
 FPS = 60
 BADDIEMINSIZE = 30
@@ -15,15 +15,13 @@ ADDNEWBADDIERATE = 40 # Fréquence d'apparition des ennemis
 PLAYERMOVERATE = 5
 INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
 CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre"] # Réponses acceptées
-FONTSIZE = 40 # utile?
+FONTSIZE = 40
 NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
 LIVES = 3  # Nombre initial de vies # MODIFICATION
 HEART_SIZE = (50, 50)  # Taille des cœurs
 JUMPSPEED = 15
 GRAVITY = 1
 GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
-#NEW_PLAYER_SIZE = (220, 220)  # Taille souhaitée pour le joueur # à en lever car ce répette en haut et taille trop grande
-
 
 class Baddie:
     def __init__(self, images, min_size, max_size, min_speed, max_speed):
@@ -162,7 +160,7 @@ windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption('Spooky Sprint')
 pygame.mouse.set_visible(False)
 
-# Set up the fonts. # utile?
+# Set up the fonts.
 font = pygame.font.SysFont(None, 48) # taille 48 pour le texte
 
 # Set up sounds.
@@ -178,7 +176,6 @@ for i in range(1, 5):
     image.set_colorkey((0, 0, 0))  # Rendre le fond noir transparent
     image = pygame.transform.scale(image, NEW_PLAYER_SIZE)  # Redimensionner
     playerImages.append(image)
-playerRect = playerImages[0].get_rect() #CHANGEMENT # à mettre dans "Set up player"
 heartImage = pygame.image.load('heart.png')  # Image de cœur
 heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
 backgroundImage_StartScreen = pygame.image.load('start.webp')
@@ -207,6 +204,10 @@ waitForPlayerToPressKey()
 # Set up player.
 playerIndex = 0  # CHANGEMENT Index de l'image actuelle pour l'animation
 animationCounter = 0  # CHANGEMENT Compteur pour contrôler la vitesse d'animation
+playerRect = playerImages[0].get_rect()
+
+# Set up lives.
+top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte)
 
 # Set up backgroundImage.
 Speed = 5 # vitesse de défilement de l'arrière-plan
@@ -439,7 +440,6 @@ while True:
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
         drawText('Top Score: %s' % (topScore), font, windowSurface, 10, 40)
         drawText('Level: %s' % (level), font, windowSurface, WINDOWWIDTH - 200, 10)
-        top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte) #MODIFICATION Affichage des coeurs # à mettre dans "Set up lives"
         drawHearts(windowSurface, lives, heartImage, 10, top_score_y)
 
         # Draw the player's rectangle.
@@ -448,11 +448,6 @@ while True:
         # Draw each baddie.
         for b in baddies:
             windowSurface.blit(b.image, b.rect)
-            
-
-        # Afficher les cœurs restants MODIFICATION
-        top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte) # à mettre dans "Set up lives"
-        drawHearts(windowSurface, lives, heartImage, 10, top_score_y) # à effacer car ce répette en haut!
 
 
         pygame.display.update()
