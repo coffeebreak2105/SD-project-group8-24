@@ -133,8 +133,10 @@ def playerHasHitBaddie(playerRect, baddies):
             return True
     return False
 
-def drawText(text, font, surface, x, y): # à changer avec la fonction drawText de la question
-    textobj = font.render(text, 1, TEXTCOLOR)
+def drawText(text, font, surface, x, y, color=None):
+    if color is None:
+        color = TEXTCOLOR
+    textobj = font.render(text, True, color)
     textrect = textobj.get_rect()
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
@@ -144,14 +146,6 @@ def drawHearts(surface, lives, heartImage, start_x, start_y):
     # Affiche les cœurs en fonction des vies restantes à une position donnée
     for i in range(lives):
         surface.blit(heartImage, (start_x + i * (HEART_SIZE[0] + 5), start_y))
-
-#Fonction pour la question du début
-def drawText(text, font, surface, x, y, color=TEXTCOLOR):
-    # Affiche du texte à une position donnée
-    textobj = font.render(text, True, color)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
 
 # Set up pygame, the window, and the mouse cursor.
 pygame.init()
