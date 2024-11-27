@@ -235,9 +235,7 @@ def questionScreen():
                 else:  # Ajoute du texte tapé
                     input_text += event.unicode
 
-# Exemple d'utilisation
 score = questionScreen()
-print("Score du joueur:", score)
 
 # Écran de démarrage du jeu
 windowSurface.blit(bgImage_StartScreen, (0, 0))
