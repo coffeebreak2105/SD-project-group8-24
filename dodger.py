@@ -4,7 +4,7 @@ from pygame.locals import *
 ANIMATION_SPEED = 5  # CHANGEMENT Vitesse d'animation (nombre de frames avant de changer d'image)
 WINDOWWIDTH = 1200
 WINDOWHEIGHT = 600
-TEXTCOLOR = (0, 0, 0)
+TEXTCOLOR = (0, 0, 0) # utile?
 BACKGROUNDCOLOR = (255, 255, 255)
 FPS = 60
 BADDIEMINSIZE = 30
@@ -15,17 +15,16 @@ ADDNEWBADDIERATE = 40 # Fréquence d'apparition des ennemis
 PLAYERMOVERATE = 5
 INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
 CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre"] # Réponses acceptées
-FONTSIZE = 40
+FONTSIZE = 40 # utile?
 NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
 LIVES = 3  # Nombre initial de vies # MODIFICATION
 HEART_SIZE = (50, 50)  # Taille des cœurs
 JUMPSPEED = 15
 GRAVITY = 1
 GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
-NEW_PLAYER_SIZE = (220, 220)  # Taille souhaitée pour le joueur
+#NEW_PLAYER_SIZE = (220, 220)  # Taille souhaitée pour le joueur # à en lever car ce répette en haut et taille trop grande
 
 
-# Classe Baddie
 class Baddie:
     def __init__(self, images, min_size, max_size, min_speed, max_speed):
         # Définir les types de baddies et leurs images spécifiques
@@ -136,7 +135,7 @@ def playerHasHitBaddie(playerRect, baddies):
             return True
     return False
 
-def drawText(text, font, surface, x, y):
+def drawText(text, font, surface, x, y): # à changer avec la fonction drawText de la question
     textobj = font.render(text, 1, TEXTCOLOR)
     textrect = textobj.get_rect()
     textrect.topleft = (x, y)
@@ -144,7 +143,7 @@ def drawText(text, font, surface, x, y):
 
 #Fonction pour afficher les coeurs
 def drawHearts(surface, lives, heartImage, start_x, start_y):
-    """Affiche les cœurs en fonction des vies restantes à une position donnée."""
+    # Affiche les cœurs en fonction des vies restantes à une position donnée
     for i in range(lives):
         surface.blit(heartImage, (start_x + i * (HEART_SIZE[0] + 5), start_y))
 
@@ -163,7 +162,7 @@ windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption('Spooky Sprint')
 pygame.mouse.set_visible(False)
 
-# Set up the fonts.
+# Set up the fonts. # utile?
 font = pygame.font.SysFont(None, 48) # taille 48 pour le texte
 
 # Set up sounds.
@@ -179,7 +178,7 @@ for i in range(1, 5):
     image.set_colorkey((0, 0, 0))  # Rendre le fond noir transparent
     image = pygame.transform.scale(image, NEW_PLAYER_SIZE)  # Redimensionner
     playerImages.append(image)
-playerRect = playerImages[0].get_rect() #CHANGEMENT
+playerRect = playerImages[0].get_rect() #CHANGEMENT # à mettre dans "Set up player"
 heartImage = pygame.image.load('heart.png')  # Image de cœur
 heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
 backgroundImage_StartScreen = pygame.image.load('start.webp')
@@ -191,8 +190,7 @@ baddie_images = [
     pygame.image.load('baddie3.png'),
     pygame.image.load('baddie4.png'),
 ]
-#backgroundImage = pygame.image.load('Wood.jpg').convert()
-#bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
+# Images pour les backgrounds
 backgrounds = { 
     1: pygame.transform.scale(pygame.image.load('Wood.jpg').convert(), (WINDOWWIDTH, WINDOWHEIGHT)),
     2: pygame.transform.scale(pygame.image.load('Wood2.jpg').convert(), (WINDOWWIDTH, WINDOWHEIGHT)),
@@ -225,7 +223,7 @@ teapot.rect.x = WINDOWWIDTH
 
 #Question bonus
 def questionScreen():
-    """Affiche une question avec une zone de réponse."""
+    # Affiche une question avec une zone de réponse
     input_text = ""  # Texte saisi par le joueur
     question = "When is Halloween?"  # La question
     score = 0  # Score initial
@@ -304,7 +302,6 @@ while True:
     # Set up the start of the game.
     baddies = []
     level = 1
-    score = 0 # à enlever?
     playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL -playerRect.height)
     moveLeft = moveRight = False
     reverseCheat = slowCheat = False
@@ -378,7 +375,7 @@ while True:
                 jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
 
         
-        # Update player animation CHANGEMENT
+        # Update player animation CHANGEMENT # changer ça de place
         animationCounter += 1
         if animationCounter >= ANIMATION_SPEED:
             animationCounter = 0
@@ -438,11 +435,11 @@ while True:
             if level > 3:
                 level = 1
 
-        # Draw the score, top score, level.
+        # Draw the score, top score, level, lives.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
         drawText('Top Score: %s' % (topScore), font, windowSurface, 10, 40)
         drawText('Level: %s' % (level), font, windowSurface, WINDOWWIDTH - 200, 10)
-        top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte) #MODIFICATION Affichage des coeurs
+        top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte) #MODIFICATION Affichage des coeurs # à mettre dans "Set up lives"
         drawHearts(windowSurface, lives, heartImage, 10, top_score_y)
 
         # Draw the player's rectangle.
@@ -454,8 +451,8 @@ while True:
             
 
         # Afficher les cœurs restants MODIFICATION
-        top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte)
-        drawHearts(windowSurface, lives, heartImage, 10, top_score_y)
+        top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte) # à mettre dans "Set up lives"
+        drawHearts(windowSurface, lives, heartImage, 10, top_score_y) # à effacer car ce répette en haut!
 
 
         pygame.display.update()
