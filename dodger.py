@@ -93,6 +93,29 @@ class Baddie:
             (self.baddie_type == 'baddie4' and self.rect.top > WINDOWHEIGHT)
         ) 
     
+
+class ObjectMagic:
+    def __init__(self, image_path, scale_size, points, y_position, speed):
+        self.image = pygame.image.load(image_path).convert_alpha()
+        self.image = pygame.transform.scale(self.image, scale_size)
+        self.rect = self.image.get_rect()
+        self.rect.y = y_position
+        self.rect.x = WINDOWWIDTH
+        self.points = points
+        self.speed = speed
+
+    def move_and_draw(self, surface):
+        self.rect.x -= self.speed # Déplacer l'objet vers la gauche
+        if self.rect.right < 0: # Si l'objet sort de l'écran, le remettre à droite
+            self.rect.x = WINDOWWIDTH
+        surface.blit(self.image, self.rect) # Afficher l'image de l'objet sur la surface
+
+    def check_collision(self, player_rect):
+        if player_rect.colliderect(self.rect): # Vérifier la collision avec le joueur
+            self.rect.x = WINDOWWIDTH # Réinitialiser la position de l'objet à droite de l'écran après la collision
+            return self.points  # Retourne les points pour ajouter au score
+        return 0  # Pas de collision, pas de points
+
 def terminate():
     pygame.quit()
     sys.exit()
@@ -145,7 +168,6 @@ font = pygame.font.SysFont(None, 48) # taille 48 pour le texte
 
 # Set up sounds.
 gameOverSound = pygame.mixer.Sound('gameover.wav')
-pygame.mixer.music.load('background.mid') # à effacer?
 pygame.mixer.music.load('soundstart.mp3') # musique page accueil
 pygame.mixer.music.play(-1, 0.0) # -1 pour que la musique soit à l'infini
 
@@ -160,10 +182,6 @@ for i in range(1, 5):
 playerRect = playerImages[0].get_rect() #CHANGEMENT
 heartImage = pygame.image.load('heart.png')  # Image de cœur
 heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
-backgroundImage = pygame.image.load('Wood.jpg').convert()
-bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
-Speed = 5 # vitesse de défilement de l'arrière-plan
-bg_x = 0 # position de départ de l'arrière-plan
 backgroundImage_StartScreen = pygame.image.load('start.webp')
 bgImage_StartScreen = pygame.transform.scale(backgroundImage_StartScreen, (WINDOWWIDTH, WINDOWHEIGHT))
 # Images pour les ennemis
@@ -173,6 +191,13 @@ baddie_images = [
     pygame.image.load('baddie3.png'),
     pygame.image.load('baddie4.png'),
 ]
+#backgroundImage = pygame.image.load('Wood.jpg').convert()
+#bgImage = pygame.transform.scale(backgroundImage, (WINDOWWIDTH, WINDOWHEIGHT))
+backgrounds = { 
+    1: pygame.transform.scale(pygame.image.load('Wood.jpg').convert(), (WINDOWWIDTH, WINDOWHEIGHT)),
+    2: pygame.transform.scale(pygame.image.load('Wood2.jpg').convert(), (WINDOWWIDTH, WINDOWHEIGHT)),
+    3: pygame.transform.scale(pygame.image.load('Wood3.jpg').convert(), (WINDOWWIDTH, WINDOWHEIGHT)),
+}
 
 # Show the "Start" screen.
 windowSurface.blit(bgImage_StartScreen, (0,0))
@@ -181,8 +206,22 @@ drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 2.5) - 30,
 pygame.display.update()
 waitForPlayerToPressKey()
 
+# Set up player.
 playerIndex = 0  # CHANGEMENT Index de l'image actuelle pour l'animation
 animationCounter = 0  # CHANGEMENT Compteur pour contrôler la vitesse d'animation
+
+# Set up backgroundImage.
+Speed = 5 # vitesse de défilement de l'arrière-plan
+bg_x = 0 # position de départ de l'arrière-plan
+
+# Set up ObjectMagic.
+frog = ObjectMagic('Frog.png', (50,50), 200, WINDOWHEIGHT-50, Speed)
+bird = ObjectMagic('Bird.png', (50,50), 300, WINDOWHEIGHT-50, Speed)
+teapot = ObjectMagic('TeaPot.png', (50,50), 500, WINDOWHEIGHT-50, Speed)
+# Initialiser position horizontale pour chaque objet
+frog.rect.x = WINDOWWIDTH
+bird.rect.x = WINDOWWIDTH
+teapot.rect.x = WINDOWWIDTH
 
 #Question bonus
 def questionScreen():
@@ -264,6 +303,8 @@ topScore = 0
 while True:
     # Set up the start of the game.
     baddies = []
+    level = 1
+    score = 0 # à enlever?
     playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL -playerRect.height)
     moveLeft = moveRight = False
     reverseCheat = slowCheat = False
@@ -356,16 +397,51 @@ while True:
         baddies = [b for b in baddies if not b.is_off_screen()]
 
         # Draw scrolling background
+        bgImage = backgrounds[level] # définir background selon level
         windowSurface.blit(bgImage, (bg_x, 0))
         windowSurface.blit(bgImage, (bg_x + WINDOWWIDTH, 0))
         bg_x -= Speed # déplacer arrière-plan vers la gauche
 
         if bg_x <= -WINDOWWIDTH:
-            bg_x = 0       
+            bg_x = 0
+        
+        # Draw ObjectMagic with levels.
+        if level == 1:
+            # Déplacement de l'objet frog
+            windowSurface.blit(frog.image, (frog.rect.x, frog.rect.y))
+            frog.rect.x -= frog.speed
+            if frog.rect.x <= -frog.rect.width:
+                frog.rect.x = WINDOWWIDTH
+            # Vérification collision player et objet magique
+            if playerRect.colliderect(frog.rect):
+                score += frog.points
+                frog.rect.x = WINDOWWIDTH
+        elif level == 2:
+            windowSurface.blit(bird.image, (bird.rect.x, bird.rect.y))
+            bird.rect.x -= bird.speed
+            if bird.rect.x <= -bird.rect.width:
+                bird.rect.x = WINDOWWIDTH
+            if playerRect.colliderect(bird.rect):
+                score += bird.points
+                bird.rect.x = WINDOWWIDTH
+        elif level == 3:
+            windowSurface.blit(teapot.image, (teapot.rect.x, teapot.rect.y))
+            teapot.rect.x -= teapot.speed
+            if teapot.rect.x <= -teapot.rect.width:
+                teapot.rect.x = WINDOWWIDTH
+            if playerRect.colliderect(teapot.rect):
+                score += teapot.points
+                teapot.rect.x = WINDOWWIDTH
+        # Passage au level suivant
+        if score >= 1000 * level:
+            level += 1
+            if level > 3:
+                level = 1
 
-        # Draw the score and top score.
+        # Draw the score, top score, level.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
         drawText('Top Score: %s' % (topScore), font, windowSurface, 10, 40)
+        drawText('Level: %s' % (level), font, windowSurface, WINDOWWIDTH - 200, 10)
         top_score_y = 40 + 50  # Position du "Top Score" (40 pixels en haut + taille du texte) #MODIFICATION Affichage des coeurs
         drawHearts(windowSurface, lives, heartImage, 10, top_score_y)
 
