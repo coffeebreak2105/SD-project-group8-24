@@ -125,7 +125,14 @@ def drawHearts(surface, lives, heartImage, start_x, start_y):
     for i in range(lives):
         surface.blit(heartImage, (start_x + i * (HEART_SIZE[0] + 5), start_y))
 
-          
+#Fonction pour la question du début
+def drawText(text, font, surface, x, y, color=TEXTCOLOR):
+    # Affiche du texte à une position donnée
+    textobj = font.render(text, True, color)
+    textrect = textobj.get_rect()
+    textrect.topleft = (x, y)
+    surface.blit(textobj, textrect)
+
 # Set up pygame, the window, and the mouse cursor.
 pygame.init()
 mainClock = pygame.time.Clock()
@@ -178,23 +185,6 @@ playerIndex = 0  # CHANGEMENT Index de l'image actuelle pour l'animation
 animationCounter = 0  # CHANGEMENT Compteur pour contrôler la vitesse d'animation
 
 #Question bonus
-# Initialisation de Pygame
-pygame.init()
-windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-pygame.display.set_caption("Spooky Sprint")
-font = pygame.font.SysFont(None, FONTSIZE)
-
-# Chargement de l'image de fond
-backgroundImage_StartScreen = pygame.image.load('start.webp')
-bgImage_StartScreen = pygame.transform.scale(backgroundImage_StartScreen, (WINDOWWIDTH, WINDOWHEIGHT))
-
-def drawText(text, font, surface, x, y, color=TEXTCOLOR):
-    """Affiche du texte à une position donnée."""
-    textobj = font.render(text, True, color)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
-
 def questionScreen():
     """Affiche une question avec une zone de réponse."""
     input_text = ""  # Texte saisi par le joueur
@@ -245,9 +235,7 @@ def questionScreen():
                 else:  # Ajoute du texte tapé
                     input_text += event.unicode
 
-# Exemple d'utilisation
 score = questionScreen()
-print("Score du joueur:", score)
 
 # Écran de démarrage du jeu
 windowSurface.blit(bgImage_StartScreen, (0, 0))
@@ -276,7 +264,6 @@ topScore = 0
 while True:
     # Set up the start of the game.
     baddies = []
-    score = 0
     playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL -playerRect.height)
     moveLeft = moveRight = False
     reverseCheat = slowCheat = False
