@@ -127,7 +127,7 @@ def drawHearts(surface, lives, heartImage, start_x, start_y):
 
 #Fonction pour la question du début
 def drawText(text, font, surface, x, y, color=TEXTCOLOR):
-    """Affiche du texte à une position donnée."""
+    # Affiche du texte à une position donnée
     textobj = font.render(text, True, color)
     textrect = textobj.get_rect()
     textrect.topleft = (x, y)
