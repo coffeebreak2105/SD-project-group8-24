@@ -425,10 +425,13 @@ while True:
                 score += teapot.points
                 teapot.rect.x = WINDOWWIDTH
         # Passage au level suivant
-        if score >= 1000 * level:
+        if score >= 1000 * level and not level_up:
             level += 1
+            level_up = True
             if level > 3:
                 level = 1
+        elif score < 1000 * level:
+            level_up = False 
 
         # Draw the score, top score, level, lives.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
