@@ -163,6 +163,7 @@ font = pygame.font.SysFont(None, 48) # taille 48 pour le texte
 
 # Set up sounds.
 gameOverSound = pygame.mixer.Sound('gameover.wav')
+collectObjectMagic = pygame.mixer.Sound('pickup.wav')
 #pygame.mixer.music.load('soundstart.mp3') # musique page accueil (Jessica)
 #pygame.mixer.music.play(-1, 0.0) # -1 pour que la musique soit à l'infini (Jessica)
 # Sounds for levels
@@ -424,6 +425,7 @@ while True:
             if playerRect.colliderect(frog.rect):
                 score += frog.points
                 frog.rect.x = WINDOWWIDTH
+                collectObjectMagic.play()
         elif level == 2:
             windowSurface.blit(bird.image, (bird.rect.x, bird.rect.y))
             bird.rect.x -= bird.speed
@@ -432,6 +434,7 @@ while True:
             if playerRect.colliderect(bird.rect):
                 score += bird.points
                 bird.rect.x = WINDOWWIDTH
+                collectObjectMagic.play()
         elif level == 3:
             windowSurface.blit(teapot.image, (teapot.rect.x, teapot.rect.y))
             teapot.rect.x -= teapot.speed
@@ -440,6 +443,7 @@ while True:
             if playerRect.colliderect(teapot.rect):
                 score += teapot.points
                 teapot.rect.x = WINDOWWIDTH
+                collectObjectMagic.play()
         # Passage au level suivant
         if score >= 1000 * level:
             level += 1
