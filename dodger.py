@@ -141,11 +141,15 @@ def drawText(text, font, surface, x, y, color=None):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
-#Fonction pour afficher les coeurs
-def drawHearts(surface, lives, heartImage, start_x, start_y):
+def drawHearts(surface, lives, heartImage, start_x, start_y): # Fonction pour afficher les coeurs
     # Affiche les cœurs en fonction des vies restantes à une position donnée
     for i in range(lives):
         surface.blit(heartImage, (start_x + i * (HEART_SIZE[0] + 5), start_y))
+
+def play_level_music(level): # Fonction pour changer sound des levels
+    if level in level_sounds:
+        pygame.mixer.music.load(level_sounds[level])
+        pygame.mixer.music.play(-1, 0.0)
 
 # Set up pygame, the window, and the mouse cursor.
 pygame.init()
@@ -159,8 +163,14 @@ font = pygame.font.SysFont(None, 48) # taille 48 pour le texte
 
 # Set up sounds.
 gameOverSound = pygame.mixer.Sound('gameover.wav')
-pygame.mixer.music.load('soundstart.mp3') # musique page accueil
-pygame.mixer.music.play(-1, 0.0) # -1 pour que la musique soit à l'infini
+#pygame.mixer.music.load('soundstart.mp3') # musique page accueil (Jessica)
+#pygame.mixer.music.play(-1, 0.0) # -1 pour que la musique soit à l'infini (Jessica)
+# Sounds for levels
+level_sounds = { 
+    1: 'sound_level1.mp3',
+    2: 'sound_level2.mp3',
+    3: 'sound_level3.mp3',
+}
 
 # Set up images. CHANGEMENT
 # Charger les images des joueurs et retirer le fond blanc
@@ -297,6 +307,7 @@ while True:
     # Set up the start of the game.
     baddies = []
     level = 1
+    previous_level = None # Pour son dans level
     playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL -playerRect.height)
     moveLeft = moveRight = False
     reverseCheat = slowCheat = False
@@ -304,7 +315,7 @@ while True:
     jumpSpeed = JUMPSPEED  # Initial jump speed
     baddieAddCounter = 0
     lives = LIVES  # Initialiser les vies pour chaque nouvelle partie # MODIFICATION
-    pygame.mixer.music.play(-1, 0.0)
+    #pygame.mixer.music.play(-1, 0.0) #(Jessica)
 
     while True: # The game loop runs while the game part is playing.
         score += 1 # Increase score.
@@ -396,6 +407,11 @@ while True:
 
         if bg_x <= -WINDOWWIDTH:
             bg_x = 0
+        
+        # Vérification si level a changé pour le sound
+        if level != previous_level:
+            play_level_music(level)
+            previous_level = level
         
         # Draw ObjectMagic with levels.
         if level == 1:
