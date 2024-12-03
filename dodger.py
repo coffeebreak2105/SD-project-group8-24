@@ -21,7 +21,7 @@ LIVES = 3  # Nombre initial de vies # MODIFICATION
 HEART_SIZE = (50, 50)  # Taille des cœurs
 JUMPSPEED = 15
 GRAVITY = 1
-GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
+GROUND_LEVEL = WINDOWHEIGHT - 50  # Changement (lara)/ Niveau du sol pour le personnage et les ennemis
 
 class Baddie:
     def __init__(self, images, min_size, max_size, min_speed, max_speed):
@@ -46,7 +46,7 @@ class Baddie:
             # Mouvement horizontal au sol
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
-                GROUND_LEVEL - self.image.get_height(),
+                GROUND_LEVEL, # changement, remarque je comprends pas car de gauche à droite (lara)
                 self.image.get_width(),
                 self.image.get_height()
             )
@@ -54,7 +54,7 @@ class Baddie:
             # Mouvement volant
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
-                random.randint(50, GROUND_LEVEL - 100),
+                GROUND_LEVEL, # changement (je comprends pas car n'oscille plus) (lara)
                 self.image.get_width(),
                 self.image.get_height()
             )
@@ -208,9 +208,9 @@ Speed = 5 # vitesse de défilement de l'arrière-plan
 bg_x = 0 # position de départ de l'arrière-plan
 
 # Set up ObjectMagic.
-frog = ObjectMagic('Frog.png', (50,50), 200, WINDOWHEIGHT-50, Speed)
-bird = ObjectMagic('Bird.png', (50,50), 300, WINDOWHEIGHT-50, Speed)
-teapot = ObjectMagic('TeaPot.png', (50,50), 500, WINDOWHEIGHT-50, Speed)
+frog = ObjectMagic('Frog.png', (50,50), 200, GROUND_LEVEL, Speed) #changement lara
+bird = ObjectMagic('Bird.png', (50,50), 300, GROUND_LEVEL, Speed)
+teapot = ObjectMagic('TeaPot.png', (50,50), 500, GROUND_LEVEL, Speed)
 # Initialiser position horizontale pour chaque objet
 frog.rect.x = WINDOWWIDTH
 bird.rect.x = WINDOWWIDTH
@@ -297,7 +297,7 @@ while True:
     # Set up the start of the game.
     baddies = []
     level = 1
-    playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL -playerRect.height)
+    playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 30) # changement lara
     moveLeft = moveRight = False
     reverseCheat = slowCheat = False
     isJumping = False
@@ -365,7 +365,7 @@ while True:
 
             # If the player lands on the ground
             if playerRect.bottom >= GROUND_LEVEL:
-                playerRect.bottom = GROUND_LEVEL
+                playerRect.bottom = GROUND_LEVEL # A CHANGER CAR QUAND JE SAUTE JE RETOMBE PAS A LA BONNE HAUTEUR (lara)
                 isJumping = False
                 jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
 
@@ -455,7 +455,7 @@ while True:
                 break
             else:
                 # Réinitialisez la position du joueur
-                playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)  # MODIFICATION
+                playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 30)  # MODIFICATION # Changement lara
                 baddies = []  # Réinitialisez les baddies # MODIFICATION
 
         mainClock.tick(FPS)
