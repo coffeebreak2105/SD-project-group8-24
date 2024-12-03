@@ -22,6 +22,8 @@ HEART_SIZE = (50, 50)  # Taille des cœurs
 JUMPSPEED = 15
 GRAVITY = 1
 GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
+game_over = False  # Ajout : Indique si le joueur a perdu
+win = False  # Ajout : Indique si le joueur a gagné
 
 class Baddie:
     def __init__(self, images, min_size, max_size, min_speed, max_speed):
@@ -132,6 +134,23 @@ def playerHasHitBaddie(playerRect, baddies):
         if playerRect.colliderect(b.rect):
             return True
     return False
+
+def displayGameOverScreen():
+    """Affiche l'écran de Game Over."""
+    windowSurface.fill((0, 0, 0))  # Fond noir
+    drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 2), (255, 0, 0))
+    drawText('Press any key to restart.', font, windowSurface, (WINDOWWIDTH / 3.5), (WINDOWHEIGHT / 2) + 50, TEXTCOLOR)
+    pygame.display.update()
+    waitForPlayerToPressKey()
+
+def displayWinScreen():
+    """Affiche la séquence de victoire avec trois images."""
+    win_images = [pygame.image.load(f'win{i}.png') for i in range(1, 4)]
+    for image in win_images:
+        scaled_image = pygame.transform.scale(image, (WINDOWWIDTH, WINDOWHEIGHT))
+        windowSurface.blit(scaled_image, (0, 0))
+        pygame.display.update()
+        pygame.time.wait(100)  # Pause de 0.1 secondes entre les images
 
 def drawText(text, font, surface, x, y, color=None):
     if color is None:
@@ -428,7 +447,11 @@ while True:
         if score >= 1000 * level:
             level += 1
             if level > 3:
-                level = 1
+                displayWinScreen()  # Affiche les images de victoire 
+                level = 1  # Réinitialise le niveau
+                score = 0  # Réinitialise le score
+                break  # Quitte la boucle pour redémarrer une nouvelle partie
+
 
         # Draw the score, top score, level, lives.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
@@ -452,6 +475,7 @@ while True:
             if lives <= 0:  # Si plus de vies, fin du jeu # MODIFICATION
                 if score > topScore:
                     topScore = score  # set new top score
+                    displayGameOverScreen()  # Afficher l'écran Game Over
                 break
             else:
                 # Réinitialisez la position du joueur
@@ -462,11 +486,11 @@ while True:
 
     # Stop the game and show the "Game Over" screen.
     pygame.mixer.music.stop()
-    gameOverSound.play()
-
-    drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
+if game_over:
+    drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3), (255, 0, 0))
     drawText('Press a key to play again.', font, windowSurface, (WINDOWWIDTH / 3) - 80, (WINDOWHEIGHT / 3) + 50)
     pygame.display.update()
     waitForPlayerToPressKey()
-
+elif win:
+    displayWinScreen()  # Affiche l'écran de victoire
     gameOverSound.stop()
