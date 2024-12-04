@@ -301,6 +301,7 @@ while True:
     moveLeft = moveRight = False
     reverseCheat = slowCheat = False
     isJumping = False
+    canDoubleJump = False
     jumpSpeed = JUMPSPEED  # Initial jump speed
     baddieAddCounter = 0
     lives = LIVES  # Initialiser les vies pour chaque nouvelle partie # MODIFICATION
@@ -325,8 +326,15 @@ while True:
                     moveLeft = False
                     moveRight = True
                 if event.key == K_SPACE and not isJumping:
+                    # Premier saut
                     isJumping = True  # Start the jump
+                    canDoubleJump = True # Activer le double saut
                     jumpSpeed = JUMPSPEED  # Reset jump speed for the jump
+                elif canDoubleJump :
+                    # Double saut 
+                    canDoubleJump = False # désactiver le double saut
+                    jumpSpeed = JUMPSPEED
+
 
             if event.type == KEYUP:
                 if event.key == K_z:
@@ -367,6 +375,7 @@ while True:
             if playerRect.bottom >= GROUND_LEVEL:
                 playerRect.bottom = GROUND_LEVEL
                 isJumping = False
+                canDoubleJump = False
                 jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
 
         
