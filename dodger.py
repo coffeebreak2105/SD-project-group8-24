@@ -164,8 +164,6 @@ font = pygame.font.SysFont(None, 48) # taille 48 pour le texte
 # Set up sounds.
 gameOverSound = pygame.mixer.Sound('gameover.wav')
 collectObjectMagic = pygame.mixer.Sound('pickup.wav')
-#pygame.mixer.music.load('soundstart.mp3') # musique page accueil (Jessica)
-#pygame.mixer.music.play(-1, 0.0) # -1 pour que la musique soit à l'infini (Jessica)
 # Sounds for levels
 level_sounds = { 
     1: 'sound_level1.mp3',
@@ -317,7 +315,6 @@ while True:
     jumpSpeed = JUMPSPEED  # Initial jump speed
     baddieAddCounter = 0
     lives = LIVES  # Initialiser les vies pour chaque nouvelle partie # MODIFICATION
-    #pygame.mixer.music.play(-1, 0.0) #(Jessica)
 
     while True: # The game loop runs while the game part is playing.
         score += 1 # Increase score.
