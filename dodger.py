@@ -364,10 +364,10 @@ while True:
             jumpSpeed -= GRAVITY  # Gravity effect
 
             # If the player lands on the ground
-            if playerRect.bottom >= GROUND_LEVEL:
-                playerRect.bottom = GROUND_LEVEL # A CHANGER CAR QUAND JE SAUTE JE RETOMBE PAS A LA BONNE HAUTEUR (lara)
+            if playerRect.bottom >= GROUND_LEVEL + 50:
+                playerRect.bottom = GROUND_LEVEL + 50  # changement lara
                 isJumping = False
-                jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
+                jumpSpeed = JUMPSPEED # Réinitialise la vitesse de saut pour la prochaine fois
 
         
         # Update player animation CHANGEMENT # changer ça de place
