@@ -144,13 +144,37 @@ def displayGameOverScreen():
     waitForPlayerToPressKey()
 
 def displayWinScreen():
-    """Affiche la séquence de victoire avec trois images."""
+    """Affiche la séquence de victoire avec trois images en boucle et attend une touche."""
     win_images = [pygame.image.load(f'win{i}.png') for i in range(1, 4)]
-    for image in win_images:
-        scaled_image = pygame.transform.scale(image, (WINDOWWIDTH, WINDOWHEIGHT))
-        windowSurface.blit(scaled_image, (0, 0))
+    scaled_images = [pygame.transform.scale(image, (WINDOWWIDTH, WINDOWHEIGHT)) for image in win_images]
+
+    current_index = 0  # Index de l'image actuelle
+    animation_counter = 0  # Compteur pour l'animation
+    animation_speed = FPS // 6  # Vitesse d'animation (3 images par seconde)
+
+    while True:
+        # Gestion des événements pour détecter une touche
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                terminate()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    terminate()
+                return  # Quitte la fonction si une touche est pressée
+
+        # Afficher l'image actuelle
+        windowSurface.blit(scaled_images[current_index], (0, 0))
+        drawText('Press any key to restart', font, windowSurface, WINDOWWIDTH // 3, WINDOWHEIGHT - 150, TEXTCOLOR)
         pygame.display.update()
-        pygame.time.wait(100)  # Pause de 0.1 secondes entre les images
+
+        # Gérer l'animation des images
+        animation_counter += 1
+        if animation_counter >= animation_speed:
+            animation_counter = 0
+            current_index = (current_index + 1) % len(scaled_images)
+
+        mainClock.tick(FPS)
+
 
 def drawText(text, font, surface, x, y, color=None):
     if color is None:
