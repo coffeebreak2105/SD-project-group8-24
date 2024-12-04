@@ -150,7 +150,7 @@ def displayWinScreen():
 
     current_index = 0  # Index de l'image actuelle
     animation_counter = 0  # Compteur pour l'animation
-    animation_speed = FPS // 6  # Vitesse d'animation (3 images par seconde)
+    animation_speed = FPS // 12  # Vitesse d'animation (3 images par seconde)
 
     while True:
         # Gestion des événements pour détecter une touche
