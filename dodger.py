@@ -46,7 +46,7 @@ class Baddie:
             # Mouvement horizontal au sol
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
-                GROUND_LEVEL, # changement, remarque je comprends pas car de gauche à droite (lara)
+                GROUND_LEVEL, # changement (lara)
                 self.image.get_width(),
                 self.image.get_height()
             )
@@ -54,7 +54,7 @@ class Baddie:
             # Mouvement volant
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
-                GROUND_LEVEL, # changement (je comprends pas car n'oscille plus) (lara)
+                random.randint(50, GROUND_LEVEL - 10), # changement (je comprends pas car n'oscille plus) (lara)
                 self.image.get_width(),
                 self.image.get_height()
             )
