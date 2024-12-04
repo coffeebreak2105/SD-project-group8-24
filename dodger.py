@@ -77,7 +77,7 @@ class Baddie:
             # Mouvement volant avec oscillation verticale
             self.rect.move_ip(-self.speed, self.vertical_speed)
             # Inverser la direction verticale si nécessaire
-            if self.rect.top <= 0 or self.rect.bottom >= GROUND_LEVEL - 50:
+            if self.rect.top <= 0 or self.rect.bottom >= GROUND_LEVEL - 10:
                 self.vertical_speed *= -1
         elif self.baddie_type == 'baddie4':
             # Mouvement vertical (chute)
