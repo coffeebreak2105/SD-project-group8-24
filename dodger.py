@@ -7,10 +7,10 @@ WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
 BACKGROUNDCOLOR = (255, 255, 255)
 FPS = 60
-BADDIEMINSIZE = 30
+BADDIEMINSIZE = 50 # changement (lara): avant 30
 BADDIEMAXSIZE = 50
-BADDIEMINSPEED = 2
-BADDIEMAXSPEED = 5
+BADDIEMINSPEED = 5 # changement (lara): avant 2
+BADDIEMAXSPEED = 8 # changement (lara): avant 5
 ADDNEWBADDIERATE = 40 # Fréquence d'apparition des ennemis
 PLAYERMOVERATE = 5
 INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
@@ -52,13 +52,17 @@ class Baddie:
             )
         elif self.baddie_type == 'baddie3':
             # Mouvement volant
+            start_y = GROUND_LEVEL - 150 # changement (lara)
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
-                random.randint(50, GROUND_LEVEL - 10), # changement (je comprends pas car n'oscille plus) (lara)
+                start_y, # changement (lara)
                 self.image.get_width(),
                 self.image.get_height()
             )
-            self.vertical_speed = random.choice([-2, 2])  # Oscillation verticale
+            # Oscillation verticale, changement (lara)
+            self.vertical_speed = 2
+            self.amplitude_top = start_y - 200
+            self.amplitude_bottom = start_y + 200
         elif self.baddie_type == 'baddie4':
             # Mouvement tombant
             self.rect = pygame.Rect(
@@ -77,7 +81,7 @@ class Baddie:
             # Mouvement volant avec oscillation verticale
             self.rect.move_ip(-self.speed, self.vertical_speed)
             # Inverser la direction verticale si nécessaire
-            if self.rect.top <= 0 or self.rect.bottom >= GROUND_LEVEL - 10:
+            if self.rect.top <= self.amplitude_top or self.rect.bottom >= self.amplitude_bottom: # cahngement (lara)
                 self.vertical_speed *= -1
         elif self.baddie_type == 'baddie4':
             # Mouvement vertical (chute)
@@ -364,7 +368,7 @@ while True:
             jumpSpeed -= GRAVITY  # Gravity effect
 
             # If the player lands on the ground
-            if playerRect.bottom >= GROUND_LEVEL + 50:
+            if playerRect.bottom >= GROUND_LEVEL + 50: # changement lara
                 playerRect.bottom = GROUND_LEVEL + 50  # changement lara
                 isJumping = False
                 jumpSpeed = JUMPSPEED # Réinitialise la vitesse de saut pour la prochaine fois
