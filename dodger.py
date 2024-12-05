@@ -137,11 +137,14 @@ def playerHasHitBaddie(playerRect, baddies):
 
 def displayGameOverScreen():
     """Affiche l'écran de Game Over."""
+    global score  # Ajoutez cette ligne pour modifier la variable globale `score`.
     windowSurface.fill((0, 0, 0))  # Fond noir
     drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 2), (255, 0, 0))
     drawText('Press any key to restart.', font, windowSurface, (WINDOWWIDTH / 3.5), (WINDOWHEIGHT / 2) + 50, TEXTCOLOR)
     pygame.display.update()
     waitForPlayerToPressKey()
+    score = 0  # Réinitialise le score après que le joueur a appuyé sur une touche.
+
 
 def displayWinScreen():
     """Affiche la séquence de victoire avec trois images en boucle et attend une touche."""
@@ -358,7 +361,7 @@ while True:
     jumpSpeed = JUMPSPEED  # Initial jump speed
     baddieAddCounter = 0
     lives = LIVES  # Initialiser les vies pour chaque nouvelle partie # MODIFICATION
-
+    score = 0
     while True: # The game loop runs while the game part is playing.
         score += 1 # Increase score.
 
