@@ -16,7 +16,7 @@ PLAYERMOVERATE = 5
 INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
 CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre", "10.31", "octobre 31st"] # Réponses acceptées
 FONTSIZE = 40
-NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
+NEW_PLAYER_SIZE = (350, 350)  # Remplacez par la taille souhaitée pour le personnage
 LIVES = 3  # Nombre initial de vies # MODIFICATION
 HEART_SIZE = (50, 50)  # Taille des cœurs
 JUMPSPEED = 15
@@ -239,10 +239,10 @@ level_sounds = {
 # Set up images. CHANGEMENT
 # Charger les images des joueurs et retirer le fond blanc
 playerImages = []
-for i in range(1, 5):
-    image = pygame.image.load(f'player{i}.png').convert()  # Charger l'image
+for i in range(1, 7):
+    image = pygame.image.load(f'player{i}.png').convert_alpha()
     image.set_colorkey((0, 0, 0))  # Rendre le fond noir transparent
-    image = pygame.transform.scale(image, NEW_PLAYER_SIZE)  # Redimensionner
+    image = pygame.transform.smoothscale(image, NEW_PLAYER_SIZE)
     playerImages.append(image)
 heartImage = pygame.image.load('heart.png')  # Image de cœur
 heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
