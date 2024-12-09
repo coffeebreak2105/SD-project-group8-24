@@ -439,7 +439,7 @@ while True:
     jumpSpeed = JUMPSPEED  # Initial jump speed
     baddieAddCounter = 0
     lives = LIVES  # Initialiser les vies pour chaque nouvelle partie # MODIFICATION
-    score = 0 # Réinitialiser le score pour la nouvelle partie
+    #score = 0 # Réinitialiser le score pour la nouvelle partie -> Jess : j'ai enlevé ça comme ça si le bonus est juste, on commence bien à 100 ; la nouvelle partie commence bien à 0
 
     while True: # The game loop runs while the game part is playing.
         score += 1 # Increase score.
