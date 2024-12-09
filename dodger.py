@@ -45,7 +45,7 @@ def get_baddie_types_by_level(level):
         return []  # Aucun baddie pour les autres niveaux
 
 class Baddie:
-    def __init__(self, images, min_size, max_size, min_speed, max_speed, crush_sprites=None, bounce_sound=None, level_baddie_types):
+    def __init__(self, images, min_size, max_size, min_speed, max_speed, level_baddie_types, crush_sprites=None, bounce_sound=None):
         # Définir les types de baddies et leurs images spécifiques
         baddie_types = {
             'baddie1': images[0],  # baddie1.png
@@ -424,7 +424,7 @@ while True:
         continue
     break
 
-# boucle principale
+
 topScore = 0
 while True:
     # Set up the start of the game.
@@ -491,7 +491,7 @@ while True:
             baddieAddCounter = 0
             level_baddie_types = get_baddie_types_by_level(level)  # Obtenez les types pour le niveau
             if level_baddie_types:  # Si des types sont disponibles pour ce niveau
-                baddies.append(Baddie(baddie_images, BADDIEMINSIZE, BADDIEMAXSIZE, BADDIEMINSPEED, BADDIEMAXSPEED, crush_sprites=crush_sprites, bounce_sound=bounce_sound, level_baddie_types))
+                baddies.append(Baddie(baddie_images, BADDIEMINSIZE, BADDIEMAXSIZE, BADDIEMINSPEED, BADDIEMAXSPEED, level_baddie_types, crush_sprites=crush_sprites, bounce_sound=bounce_sound))
 
         # Move the player around.
         if moveLeft and playerRect.left > 0:
