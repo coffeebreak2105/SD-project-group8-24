@@ -648,10 +648,10 @@ while True:
                 topScore = score
             displayGameOverScreen()  # Afficher l'écran Game Over
             break
-        else:
+        #else:
             # Réinitialisez la position du joueur
-            playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 30)  # MODIFICATION # Changement lara
-            baddies = []  # Réinitialisez les baddies # MODIFICATION
+            #playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 30)  # MODIFICATION # Changement lara
+            #baddies = []  # Réinitialisez les baddies # MODIFICATION
         mainClock.tick(FPS)
 
     # Stop the game and show the "Game Over" screen.
