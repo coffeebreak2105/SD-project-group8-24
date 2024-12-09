@@ -16,7 +16,7 @@ PLAYERMOVERATE = 5
 INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
 CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre", "10.31", "octobre 31st"] # Réponses acceptées
 FONTSIZE = 40
-NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
+NEW_PLAYER_SIZE = (250, 250)  # Remplacez par la taille souhaitée pour le personnage
 LIVES = 3  # Nombre initial de vies # MODIFICATION
 HEART_SIZE = (50, 50)  # Taille des cœurs
 JUMPSPEED = 15
@@ -25,18 +25,37 @@ GROUND_LEVEL = WINDOWHEIGHT - 50  # Changement (lara)/ Niveau du sol pour le per
 game_over = False  # Ajout : Indique si le joueur a perdu
 win = False  # Ajout : Indique si le joueur a gagné
 
+# Images pour les ennemis
+baddie_images = [
+    pygame.image.load('baddie1.png'),
+    pygame.image.load('baddie2.png'),
+    pygame.image.load('baddie3.png'),
+    pygame.image.load('baddie4.png'),
+]
+
+def get_baddie_types_by_level(level):
+    """Retourne les types de baddies disponibles pour un niveau donné."""
+    if level == 1:
+        return ['baddie1', 'baddie2']
+    elif level == 2:
+        return ['baddie2', 'baddie3']
+    elif level == 3:
+        return ['baddie3', 'baddie4']
+    else:
+        return []  # Aucun baddie pour les autres niveaux
+
 class Baddie:
-    def __init__(self, images, min_size, max_size, min_speed, max_speed):
-        # Définir les types de baddies et leurs images spécifiques
+    def __init__(self, images, min_size, max_size, min_speed, max_speed, level_baddie_types):
         baddie_types = {
-            'baddie1': images[0],  # baddie1.png
-            'baddie2': images[1],  # baddie2.png
-            'baddie3': images[2],  # baddie3.png
-            'baddie4': images[3],  # baddie4.png
+            'baddie1': images[0],
+            'baddie2': images[1],
+            'baddie3': images[2],
+            'baddie4': images[3],
         }
 
         # Choisir un type de baddie spécifique
-        self.baddie_type = random.choice(list(baddie_types.keys()))
+        self.baddie_type = random.choice(level_baddie_types)
+
         self.image = pygame.transform.scale(
             baddie_types[self.baddie_type],
             (random.randint(min_size, max_size), random.randint(min_size, max_size))
@@ -141,11 +160,14 @@ def playerHasHitBaddie(playerRect, baddies):
 
 def displayGameOverScreen():
     """Affiche l'écran de Game Over."""
+    global score  # Ajoutez cette ligne pour modifier la variable globale `score`.
     windowSurface.fill((0, 0, 0))  # Fond noir
     drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 2), (255, 0, 0))
     drawText('Press any key to restart.', font, windowSurface, (WINDOWWIDTH / 3.5), (WINDOWHEIGHT / 2) + 50, TEXTCOLOR)
     pygame.display.update()
     waitForPlayerToPressKey()
+    score = 0  # Réinitialise le score après que le joueur a appuyé sur une touche.
+
 
 def displayWinScreen():
     """Affiche la séquence de victoire avec trois images en boucle et attend une touche."""
@@ -221,22 +243,16 @@ level_sounds = {
 # Set up images. CHANGEMENT
 # Charger les images des joueurs et retirer le fond blanc
 playerImages = []
-for i in range(1, 5):
-    image = pygame.image.load(f'player{i}.png').convert()  # Charger l'image
+for i in range(1, 7):
+    image = pygame.image.load(f'player{i}.png').convert_alpha()
     image.set_colorkey((0, 0, 0))  # Rendre le fond noir transparent
-    image = pygame.transform.scale(image, NEW_PLAYER_SIZE)  # Redimensionner
+    image = pygame.transform.smoothscale(image, NEW_PLAYER_SIZE)
     playerImages.append(image)
 heartImage = pygame.image.load('heart.png')  # Image de cœur
 heartImage = pygame.transform.scale(heartImage, HEART_SIZE)  # Redimensionner l'image
 backgroundImage_StartScreen = pygame.image.load('start.webp')
 bgImage_StartScreen = pygame.transform.scale(backgroundImage_StartScreen, (WINDOWWIDTH, WINDOWHEIGHT))
-# Images pour les ennemis
-baddie_images = [
-    pygame.image.load('baddie1.png'),
-    pygame.image.load('baddie2.png'),
-    pygame.image.load('baddie3.png'),
-    pygame.image.load('baddie4.png'),
-]
+
 # Images pour les backgrounds
 backgrounds = { 
     1: pygame.transform.scale(pygame.image.load('Wood.jpg').convert(), (WINDOWWIDTH, WINDOWHEIGHT)),
@@ -362,7 +378,7 @@ while True:
     jumpSpeed = JUMPSPEED  # Initial jump speed
     baddieAddCounter = 0
     lives = LIVES  # Initialiser les vies pour chaque nouvelle partie # MODIFICATION
-
+    score = 0
     while True: # The game loop runs while the game part is playing.
         score += 1 # Increase score.
 
@@ -413,8 +429,10 @@ while True:
             baddieAddCounter += 1
         if baddieAddCounter == ADDNEWBADDIERATE:
             baddieAddCounter = 0
-            # Génère un baddie avec un type aléatoire
-            baddies.append(Baddie(baddie_images, BADDIEMINSIZE, BADDIEMAXSIZE, BADDIEMINSPEED, BADDIEMAXSPEED))
+            level_baddie_types = get_baddie_types_by_level(level)  # Obtenez les types pour le niveau
+            if level_baddie_types:  # Si des types sont disponibles pour ce niveau
+                baddies.append(Baddie(baddie_images, BADDIEMINSIZE, BADDIEMAXSIZE, BADDIEMINSPEED, BADDIEMAXSPEED, level_baddie_types))
+
 
         # Move the player around.
         if moveLeft and playerRect.left > 0:
