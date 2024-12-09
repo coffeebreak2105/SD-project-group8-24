@@ -7,10 +7,10 @@ WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
 BACKGROUNDCOLOR = (255, 255, 255)
 FPS = 60
-BADDIEMINSIZE = 30
+BADDIEMINSIZE = 50 # changement (lara): avant 30
 BADDIEMAXSIZE = 50
-BADDIEMINSPEED = 2
-BADDIEMAXSPEED = 5
+BADDIEMINSPEED = 5 # changement (lara): avant 2
+BADDIEMAXSPEED = 8 # changement (lara): avant 5
 ADDNEWBADDIERATE = 40 # Fréquence d'apparition des ennemis
 PLAYERMOVERATE = 5
 INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
@@ -21,7 +21,7 @@ LIVES = 3  # Nombre initial de vies # MODIFICATION
 HEART_SIZE = (50, 50)  # Taille des cœurs
 JUMPSPEED = 15
 GRAVITY = 1
-GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
+GROUND_LEVEL = WINDOWHEIGHT - 50  # Changement (lara)/ Niveau du sol pour le personnage et les ennemis
 game_over = False  # Ajout : Indique si le joueur a perdu
 win = False  # Ajout : Indique si le joueur a gagné
 
@@ -48,19 +48,23 @@ class Baddie:
             # Mouvement horizontal au sol
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
-                GROUND_LEVEL - self.image.get_height(),
+                GROUND_LEVEL, # changement (lara)
                 self.image.get_width(),
                 self.image.get_height()
             )
         elif self.baddie_type == 'baddie3':
             # Mouvement volant
+            start_y = GROUND_LEVEL - 150 # changement (lara)
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
-                random.randint(50, GROUND_LEVEL - 100),
+                start_y, # changement (lara)
                 self.image.get_width(),
                 self.image.get_height()
             )
-            self.vertical_speed = random.choice([-2, 2])  # Oscillation verticale
+            # Oscillation verticale, changement (lara)
+            self.vertical_speed = 2
+            self.amplitude_top = start_y - 200
+            self.amplitude_bottom = start_y + 200
         elif self.baddie_type == 'baddie4':
             # Mouvement tombant
             self.rect = pygame.Rect(
@@ -79,7 +83,7 @@ class Baddie:
             # Mouvement volant avec oscillation verticale
             self.rect.move_ip(-self.speed, self.vertical_speed)
             # Inverser la direction verticale si nécessaire
-            if self.rect.top <= 0 or self.rect.bottom >= GROUND_LEVEL - 50:
+            if self.rect.top <= self.amplitude_top or self.rect.bottom >= self.amplitude_bottom: # cahngement (lara)
                 self.vertical_speed *= -1
         elif self.baddie_type == 'baddie4':
             # Mouvement vertical (chute)
@@ -260,9 +264,9 @@ Speed = 5 # vitesse de défilement de l'arrière-plan
 bg_x = 0 # position de départ de l'arrière-plan
 
 # Set up ObjectMagic.
-frog = ObjectMagic('Frog.png', (50,50), 200, WINDOWHEIGHT-50, Speed)
-bird = ObjectMagic('Bird.png', (50,50), 300, WINDOWHEIGHT-50, Speed)
-teapot = ObjectMagic('TeaPot.png', (50,50), 500, WINDOWHEIGHT-50, Speed)
+frog = ObjectMagic('Frog.png', (50,50), 200, GROUND_LEVEL, Speed) #changement lara
+bird = ObjectMagic('Bird.png', (50,50), 300, GROUND_LEVEL, Speed)
+teapot = ObjectMagic('TeaPot.png', (50,50), 500, GROUND_LEVEL, Speed)
 # Initialiser position horizontale pour chaque objet
 frog.rect.x = WINDOWWIDTH
 bird.rect.x = WINDOWWIDTH
@@ -349,8 +353,8 @@ while True:
     # Set up the start of the game.
     baddies = []
     level = 1
+    playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 30) # changement lara
     previous_level = None # Pour son dans level
-    playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL -playerRect.height)
     moveLeft = moveRight = False
     reverseCheat = slowCheat = False
     isJumping = False
@@ -424,8 +428,8 @@ while True:
             jumpSpeed -= GRAVITY  # Gravity effect
 
             # If the player lands on the ground
-            if playerRect.bottom >= GROUND_LEVEL:
-                playerRect.bottom = GROUND_LEVEL
+            if playerRect.bottom >= GROUND_LEVEL + 50: # changement lara
+                playerRect.bottom = GROUND_LEVEL + 50  # changement lara
                 isJumping = False
                 canDoubleJump = False
                 jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
@@ -529,7 +533,7 @@ while True:
                 break
             else:
                 # Réinitialisez la position du joueur
-                playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)  # MODIFICATION
+                playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 30)  # MODIFICATION # Changement lara
                 baddies = []  # Réinitialisez les baddies # MODIFICATION
 
         mainClock.tick(FPS)
