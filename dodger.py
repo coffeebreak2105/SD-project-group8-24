@@ -369,7 +369,7 @@ while True:
     # Set up the start of the game.
     baddies = []
     level = 1
-    playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 125) # changement lara
+    playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 30) # changement lara
     previous_level = None # Pour son dans level
     moveLeft = moveRight = False
     reverseCheat = slowCheat = False
@@ -446,13 +446,13 @@ while True:
             jumpSpeed -= GRAVITY  # Gravity effect
 
             # If the player lands on the ground
-            if playerRect.bottom >= GROUND_LEVEL + 125: # changement lara
-                playerRect.bottom = GROUND_LEVEL + 125  # changement lara
+            if playerRect.bottom >= GROUND_LEVEL + 50: # changement lara
+                playerRect.bottom = GROUND_LEVEL + 50  # changement lara
                 isJumping = False
                 canDoubleJump = False
                 jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
-            if not isJumping:
-                playerRect.bottom = GROUND_LEVEL + 50
+            #if not isJumping:
+                #playerRect.bottom = GROUND_LEVEL + 50
 
         
         # Update player animation CHANGEMENT # changer ça de place
@@ -553,7 +553,7 @@ while True:
                 break
             else:
                 # Réinitialisez la position du joueur
-                playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 125)  # MODIFICATION # Changement lara
+                playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 30)  # MODIFICATION # Changement lara
                 baddies = []  # Réinitialisez les baddies # MODIFICATION
 
         mainClock.tick(FPS)
