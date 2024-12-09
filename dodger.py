@@ -547,9 +547,9 @@ while True:
         if playerHasHitBaddie(playerRect, baddies):
             lives -= 1  # Réduire les vies # MODIFICATION
             if lives <= 0:  # Si plus de vies, fin du jeu # MODIFICATION
+                displayGameOverScreen()  # Afficher l'écran Game Over
                 if score > topScore:
                     topScore = score  # set new top score
-                    displayGameOverScreen()  # Afficher l'écran Game Over
                 break
             else:
                 # Réinitialisez la position du joueur
@@ -560,11 +560,11 @@ while True:
 
     # Stop the game and show the "Game Over" screen.
     pygame.mixer.music.stop()
-if game_over:
-    drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3), (255, 0, 0))
-    drawText('Press a key to play again.', font, windowSurface, (WINDOWWIDTH / 3) - 80, (WINDOWHEIGHT / 3) + 50)
-    pygame.display.update()
-    waitForPlayerToPressKey()
-elif win:
-    displayWinScreen()  # Affiche l'écran de victoire
-    gameOverSound.stop()
+    if game_over:
+        drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3), (255, 0, 0))
+        drawText('Press a key to play again.', font, windowSurface, (WINDOWWIDTH / 3) - 80, (WINDOWHEIGHT / 3) + 50)
+        pygame.display.update()
+        waitForPlayerToPressKey()
+    elif win:
+        displayWinScreen()  # Affiche l'écran de victoire
+        gameOverSound.stop()
