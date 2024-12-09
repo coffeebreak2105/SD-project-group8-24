@@ -397,8 +397,8 @@ def questionScreen():
                     input_text += event.unicode
 
 score = questionScreen()
-if score is None:  # Si la réponse est invalide ou manquante
-    score = 0  # Initialiser le score à 0 par défaut
+#if score is None:  # Si la réponse est invalide ou manquante
+    #score = 0  # Initialiser le score à 0 par défaut
 #print(f"Score initial :{score}")
 
 # Écran de démarrage du jeu
