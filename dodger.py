@@ -16,7 +16,7 @@ PLAYERMOVERATE = 5
 INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
 CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre", "10.31", "octobre 31st"] # Réponses acceptées
 FONTSIZE = 40
-NEW_PLAYER_SIZE = (250, 250)  # Remplacez par la taille souhaitée pour le personnage
+NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
 LIVES = 3  # Nombre initial de vies # MODIFICATION
 HEART_SIZE = (50, 50)  # Taille des cœurs
 JUMPSPEED = 15
@@ -73,7 +73,7 @@ class Baddie:
             )
         elif self.baddie_type == 'baddie3':
             # Mouvement volant
-            start_y = GROUND_LEVEL - 150 # changement (lara)
+            start_y = GROUND_LEVEL - 120 # changement (lara)
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
                 start_y, # changement (lara)
@@ -451,6 +451,8 @@ while True:
                 isJumping = False
                 canDoubleJump = False
                 jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
+            if not isJumping:
+                playerRect.bottom = GROUND_LEVEL + 50
 
         
         # Update player animation CHANGEMENT # changer ça de place
