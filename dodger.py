@@ -21,12 +21,31 @@ LIVES = 3  # Nombre initial de vies # MODIFICATION
 HEART_SIZE = (50, 50)  # Taille des cœurs
 JUMPSPEED = 15
 GRAVITY = 1
-GROUND_LEVEL = WINDOWHEIGHT - 70  # Niveau du sol pour le personnage et les ennemis
+GROUND_LEVEL = WINDOWHEIGHT - 50  # Changement (lara)/ Niveau du sol pour le personnage et les ennemis
 game_over = False  # Ajout : Indique si le joueur a perdu
 win = False  # Ajout : Indique si le joueur a gagné
 
+# Images pour les ennemis
+baddie_images = [
+    pygame.image.load('baddie1.png'),
+    pygame.image.load('baddie2.png'),
+    pygame.image.load('baddie3.png'),
+    pygame.image.load('baddie4.png'),
+]
+
+def get_baddie_types_by_level(level):
+    """Retourne les types de baddies disponibles pour un niveau donné."""
+    if level == 1:
+        return ['baddie1', 'baddie2']
+    elif level == 2:
+        return ['baddie2', 'baddie3']
+    elif level == 3:
+        return ['baddie3', 'baddie4']
+    else:
+        return []  # Aucun baddie pour les autres niveaux
+
 class Baddie:
-    def __init__(self, images, min_size, max_size, min_speed, max_speed, crush_sprites=None, bounce_sound=None):
+    def __init__(self, images, min_size, max_size, min_speed, max_speed, crush_sprites=None, bounce_sound=None, level_baddie_types):
         # Définir les types de baddies et leurs images spécifiques
         baddie_types = {
             'baddie1': images[0],  # baddie1.png
@@ -36,7 +55,7 @@ class Baddie:
         }
 
         # Choisir un type de baddie spécifique
-        self.baddie_type = random.choice(list(baddie_types.keys()))
+        self.baddie_type = random.choice(level_baddie_types)
         self.image = pygame.transform.scale(
             baddie_types[self.baddie_type],
             (random.randint(min_size, max_size), random.randint(min_size, max_size))
@@ -56,19 +75,23 @@ class Baddie:
             # Mouvement horizontal au sol
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
-                GROUND_LEVEL - self.image.get_height(),
+                GROUND_LEVEL, # changement (lara)
                 self.image.get_width(),
                 self.image.get_height()
             )
         elif self.baddie_type == 'baddie3':
             # Mouvement volant
+            start_y = GROUND_LEVEL - 120 # changement (lara)
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
-                random.randint(50, GROUND_LEVEL - 100),
+                start_y, # changement (lara),
                 self.image.get_width(),
                 self.image.get_height()
             )
-            self.vertical_speed = random.choice([-2, 2])  # Oscillation verticale
+            # Oscillation verticale, changement (lara)
+            self.vertical_speed = 2
+            self.amplitude_top = start_y - 200
+            self.amplitude_bottom = start_y + 200
         elif self.baddie_type == 'baddie4':
             # Mouvement tombant
             self.rect = pygame.Rect(
@@ -87,7 +110,7 @@ class Baddie:
             # Mouvement volant avec oscillation verticale
             self.rect.move_ip(-self.speed, self.vertical_speed)
             # Inverser la direction verticale si nécessaire
-            if self.rect.top <= 0 or self.rect.bottom >= GROUND_LEVEL - 50:
+            if self.rect.top <= self.amplitude_top or self.rect.bottom >= self.amplitude_bottom: # changement (lara)
                 self.vertical_speed *= -1
         elif self.baddie_type == 'baddie4':
             # Mouvement vertical (chute)
@@ -178,11 +201,13 @@ def play_crush_animation(surface, baddie_rect):
 
 def displayGameOverScreen():
     """Affiche l'écran de Game Over."""
+    global score  # Ajoutez cette ligne pour modifier la variable globale `score`.
     windowSurface.fill((0, 0, 0))  # Fond noir
     drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 2), (255, 0, 0))
     drawText('Press any key to restart.', font, windowSurface, (WINDOWWIDTH / 3.5), (WINDOWHEIGHT / 2) + 50, TEXTCOLOR)
     pygame.display.update()
     waitForPlayerToPressKey()
+    score = 0  # Réinitialise le score après que le joueur a appuyé sur une touche.
 
 def displayWinScreen():
     """Affiche la séquence de victoire avec trois images en boucle et attend une touche."""
@@ -313,9 +338,9 @@ Speed = 5 # vitesse de défilement de l'arrière-plan
 bg_x = 0 # position de départ de l'arrière-plan
 
 # Set up ObjectMagic.
-frog = ObjectMagic('Frog.png', (50,50), 200, WINDOWHEIGHT-50, Speed)
-bird = ObjectMagic('Bird.png', (50,50), 300, WINDOWHEIGHT-50, Speed)
-teapot = ObjectMagic('TeaPot.png', (50,50), 500, WINDOWHEIGHT-50, Speed)
+frog = ObjectMagic('Frog.png', (50,50), 200, GROUND_LEVEL, Speed) #changement lara
+bird = ObjectMagic('Bird.png', (50,50), 300, GROUND_LEVEL, Speed)
+teapot = ObjectMagic('TeaPot.png', (50,50), 500, GROUND_LEVEL, Speed)
 # Initialiser position horizontale pour chaque objet
 frog.rect.x = WINDOWWIDTH
 bird.rect.x = WINDOWWIDTH
@@ -405,8 +430,8 @@ while True:
     # Set up the start of the game.
     baddies = []
     level = 1
+    playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 30) # changement lara
     previous_level = None # Pour son dans level
-    playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL -playerRect.height)
     moveLeft = moveRight = False
     reverseCheat = slowCheat = False
     isJumping = False
@@ -464,8 +489,9 @@ while True:
             baddieAddCounter += 1
         if baddieAddCounter == ADDNEWBADDIERATE:
             baddieAddCounter = 0
-            # Génère un baddie avec un type aléatoire
-            baddies.append(Baddie(baddie_images, BADDIEMINSIZE, BADDIEMAXSIZE, BADDIEMINSPEED, BADDIEMAXSPEED, crush_sprites=crush_sprites, bounce_sound=bounce_sound))
+            level_baddie_types = get_baddie_types_by_level(level)  # Obtenez les types pour le niveau
+            if level_baddie_types:  # Si des types sont disponibles pour ce niveau
+                baddies.append(Baddie(baddie_images, BADDIEMINSIZE, BADDIEMAXSIZE, BADDIEMINSPEED, BADDIEMAXSPEED, crush_sprites=crush_sprites, bounce_sound=bounce_sound, level_baddie_types))
 
         # Move the player around.
         if moveLeft and playerRect.left > 0:
@@ -479,11 +505,13 @@ while True:
             jumpSpeed -= GRAVITY  # Gravity effect
 
             # If the player lands on the ground
-            if playerRect.bottom >= GROUND_LEVEL:
-                playerRect.bottom = GROUND_LEVEL
+            if playerRect.bottom >= GROUND_LEVEL + 50: # changement lara
+                playerRect.bottom = GROUND_LEVEL + 50  # changement lara
                 isJumping = False
                 canDoubleJump = False
                 jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
+            #if not isJumping:
+                #playerRect.bottom = GROUND_LEVEL + 50
 
         
         # Update player animation CHANGEMENT # changer ça de place
@@ -620,16 +648,19 @@ while True:
                 topScore = score
             displayGameOverScreen()  # Afficher l'écran Game Over
             break
-
+        else:
+            # Réinitialisez la position du joueur
+            playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 30)  # MODIFICATION # Changement lara
+            baddies = []  # Réinitialisez les baddies # MODIFICATION
         mainClock.tick(FPS)
 
     # Stop the game and show the "Game Over" screen.
     pygame.mixer.music.stop()
-if game_over:
-    drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3), (255, 0, 0))
-    drawText('Press a key to play again.', font, windowSurface, (WINDOWWIDTH / 3) - 80, (WINDOWHEIGHT / 3) + 50)
-    pygame.display.update()
-    waitForPlayerToPressKey()
-elif win:
-    displayWinScreen()  # Affiche l'écran de victoire
-    gameOverSound.stop()
+    if game_over:
+        drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3), (255, 0, 0))
+        drawText('Press a key to play again.', font, windowSurface, (WINDOWWIDTH / 3) - 80, (WINDOWHEIGHT / 3) + 50)
+        pygame.display.update()
+        waitForPlayerToPressKey()
+    elif win:
+        displayWinScreen()  # Affiche l'écran de victoire
+        gameOverSound.stop()
