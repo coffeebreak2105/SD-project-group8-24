@@ -14,7 +14,7 @@ BADDIEMAXSPEED = 8 # changement (lara): avant 5
 ADDNEWBADDIERATE = 40 # Fréquence d'apparition des ennemis
 PLAYERMOVERATE = 5
 INPUTBOXCOLOR = (255, 255, 255) # Zone de texte blanche
-CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre"] # Réponses acceptées
+CORRECTANSWERS = ["31 october", "31st october", "october 31", "31 oct", "31 oct.", "31.10", "31 octobre", "10.31", "octobre 31st"] # Réponses acceptées
 FONTSIZE = 40
 NEW_PLAYER_SIZE = (80, 80)  # Remplacez par la taille souhaitée pour le personnage
 LIVES = 3  # Nombre initial de vies # MODIFICATION
@@ -22,6 +22,8 @@ HEART_SIZE = (50, 50)  # Taille des cœurs
 JUMPSPEED = 15
 GRAVITY = 1
 GROUND_LEVEL = WINDOWHEIGHT - 50  # Changement (lara)/ Niveau du sol pour le personnage et les ennemis
+game_over = False  # Ajout : Indique si le joueur a perdu
+win = False  # Ajout : Indique si le joueur a gagné
 
 class Baddie:
     def __init__(self, images, min_size, max_size, min_speed, max_speed):
@@ -137,6 +139,47 @@ def playerHasHitBaddie(playerRect, baddies):
             return True
     return False
 
+def displayGameOverScreen():
+    """Affiche l'écran de Game Over."""
+    windowSurface.fill((0, 0, 0))  # Fond noir
+    drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 2), (255, 0, 0))
+    drawText('Press any key to restart.', font, windowSurface, (WINDOWWIDTH / 3.5), (WINDOWHEIGHT / 2) + 50, TEXTCOLOR)
+    pygame.display.update()
+    waitForPlayerToPressKey()
+
+def displayWinScreen():
+    """Affiche la séquence de victoire avec trois images en boucle et attend une touche."""
+    win_images = [pygame.image.load(f'win{i}.png') for i in range(1, 4)]
+    scaled_images = [pygame.transform.scale(image, (WINDOWWIDTH, WINDOWHEIGHT)) for image in win_images]
+
+    current_index = 0  # Index de l'image actuelle
+    animation_counter = 0  # Compteur pour l'animation
+    animation_speed = FPS // 12  # Vitesse d'animation (3 images par seconde)
+
+    while True:
+        # Gestion des événements pour détecter une touche
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                terminate()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    terminate()
+                return  # Quitte la fonction si une touche est pressée
+
+        # Afficher l'image actuelle
+        windowSurface.blit(scaled_images[current_index], (0, 0))
+        drawText('Press any key to restart', font, windowSurface, WINDOWWIDTH // 3, WINDOWHEIGHT - 150, TEXTCOLOR)
+        pygame.display.update()
+
+        # Gérer l'animation des images
+        animation_counter += 1
+        if animation_counter >= animation_speed:
+            animation_counter = 0
+            current_index = (current_index + 1) % len(scaled_images)
+
+        mainClock.tick(FPS)
+
+
 def drawText(text, font, surface, x, y, color=None):
     if color is None:
         color = TEXTCOLOR
@@ -145,11 +188,15 @@ def drawText(text, font, surface, x, y, color=None):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
-#Fonction pour afficher les coeurs
-def drawHearts(surface, lives, heartImage, start_x, start_y):
+def drawHearts(surface, lives, heartImage, start_x, start_y): # Fonction pour afficher les coeurs
     # Affiche les cœurs en fonction des vies restantes à une position donnée
     for i in range(lives):
         surface.blit(heartImage, (start_x + i * (HEART_SIZE[0] + 5), start_y))
+
+def play_level_music(level): # Fonction pour changer sound des levels
+    if level in level_sounds:
+        pygame.mixer.music.load(level_sounds[level])
+        pygame.mixer.music.play(-1, 0.0)
 
 # Set up pygame, the window, and the mouse cursor.
 pygame.init()
@@ -163,8 +210,13 @@ font = pygame.font.SysFont(None, 48) # taille 48 pour le texte
 
 # Set up sounds.
 gameOverSound = pygame.mixer.Sound('gameover.wav')
-pygame.mixer.music.load('soundstart.mp3') # musique page accueil
-pygame.mixer.music.play(-1, 0.0) # -1 pour que la musique soit à l'infini
+collectObjectMagic = pygame.mixer.Sound('pickup.wav')
+# Sounds for levels
+level_sounds = { 
+    1: 'sound_level1.mp3',
+    2: 'sound_level2.mp3',
+    3: 'sound_level3.mp3',
+}
 
 # Set up images. CHANGEMENT
 # Charger les images des joueurs et retirer le fond blanc
@@ -302,13 +354,14 @@ while True:
     baddies = []
     level = 1
     playerRect.topleft = (WINDOWWIDTH / 2, GROUND_LEVEL - 30) # changement lara
+    previous_level = None # Pour son dans level
     moveLeft = moveRight = False
     reverseCheat = slowCheat = False
     isJumping = False
+    canDoubleJump = False
     jumpSpeed = JUMPSPEED  # Initial jump speed
     baddieAddCounter = 0
     lives = LIVES  # Initialiser les vies pour chaque nouvelle partie # MODIFICATION
-    pygame.mixer.music.play(-1, 0.0)
 
     while True: # The game loop runs while the game part is playing.
         score += 1 # Increase score.
@@ -329,8 +382,15 @@ while True:
                     moveLeft = False
                     moveRight = True
                 if event.key == K_SPACE and not isJumping:
+                    # Premier saut
                     isJumping = True  # Start the jump
+                    canDoubleJump = True # Activer le double saut
                     jumpSpeed = JUMPSPEED  # Reset jump speed for the jump
+                elif canDoubleJump :
+                    # Double saut 
+                    canDoubleJump = False # désactiver le double saut
+                    jumpSpeed = JUMPSPEED
+
 
             if event.type == KEYUP:
                 if event.key == K_z:
@@ -371,7 +431,8 @@ while True:
             if playerRect.bottom >= GROUND_LEVEL + 50: # changement lara
                 playerRect.bottom = GROUND_LEVEL + 50  # changement lara
                 isJumping = False
-                jumpSpeed = JUMPSPEED # Réinitialise la vitesse de saut pour la prochaine fois
+                canDoubleJump = False
+                jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
 
         
         # Update player animation CHANGEMENT # changer ça de place
@@ -401,6 +462,11 @@ while True:
         if bg_x <= -WINDOWWIDTH:
             bg_x = 0
         
+        # Vérification si level a changé pour le sound
+        if level != previous_level:
+            play_level_music(level)
+            previous_level = level
+        
         # Draw ObjectMagic with levels.
         if level == 1:
             # Déplacement de l'objet frog
@@ -412,6 +478,7 @@ while True:
             if playerRect.colliderect(frog.rect):
                 score += frog.points
                 frog.rect.x = WINDOWWIDTH
+                collectObjectMagic.play()
         elif level == 2:
             windowSurface.blit(bird.image, (bird.rect.x, bird.rect.y))
             bird.rect.x -= bird.speed
@@ -420,6 +487,7 @@ while True:
             if playerRect.colliderect(bird.rect):
                 score += bird.points
                 bird.rect.x = WINDOWWIDTH
+                collectObjectMagic.play()
         elif level == 3:
             windowSurface.blit(teapot.image, (teapot.rect.x, teapot.rect.y))
             teapot.rect.x -= teapot.speed
@@ -428,11 +496,16 @@ while True:
             if playerRect.colliderect(teapot.rect):
                 score += teapot.points
                 teapot.rect.x = WINDOWWIDTH
+                collectObjectMagic.play()
         # Passage au level suivant
         if score >= 1000 * level:
             level += 1
             if level > 3:
-                level = 1
+                displayWinScreen()  # Affiche les images de victoire 
+                level = 1  # Réinitialise le niveau
+                score = 0  # Réinitialise le score
+                break  # Quitte la boucle pour redémarrer une nouvelle partie
+
 
         # Draw the score, top score, level, lives.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
@@ -456,6 +529,7 @@ while True:
             if lives <= 0:  # Si plus de vies, fin du jeu # MODIFICATION
                 if score > topScore:
                     topScore = score  # set new top score
+                    displayGameOverScreen()  # Afficher l'écran Game Over
                 break
             else:
                 # Réinitialisez la position du joueur
@@ -466,11 +540,11 @@ while True:
 
     # Stop the game and show the "Game Over" screen.
     pygame.mixer.music.stop()
-    gameOverSound.play()
-
-    drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
+if game_over:
+    drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3), (255, 0, 0))
     drawText('Press a key to play again.', font, windowSurface, (WINDOWWIDTH / 3) - 80, (WINDOWHEIGHT / 3) + 50)
     pygame.display.update()
     waitForPlayerToPressKey()
-
+elif win:
+    displayWinScreen()  # Affiche l'écran de victoire
     gameOverSound.stop()
