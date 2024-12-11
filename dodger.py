@@ -25,7 +25,7 @@ GROUND_LEVEL = WINDOWHEIGHT - 50
 
 class Baddie:
     def __init__(self, images, min_size, max_size, min_speed, max_speed, level_baddie_types, crush_sprites=None, bounce_sound=None):
-        # Définir les types de baddies et leurs images spécifiques
+        # Defines the types of baddies and their specific images
         baddie_types = {
             'baddie1': images[0], 
             'baddie2': images[1], 
@@ -33,7 +33,7 @@ class Baddie:
             'baddie4': images[3], 
         }
 
-        # Choisir un type de baddie spécifique
+        # Chooses a specific type of baddie
         self.baddie_type = random.choice(level_baddie_types)
         self.image = pygame.transform.scale(
             baddie_types[self.baddie_type],
@@ -41,17 +41,17 @@ class Baddie:
         )
         self.speed = random.randint(min_speed, max_speed)
 
-        # Ressources spécifiques pour les citrouilles
+        # Specific resources for pumpkins
         self.crush_sprites = crush_sprites if self.baddie_type == 'baddie1' else None
         self.bounce_sound = bounce_sound if self.baddie_type == 'baddie1' else None
 
-        # Ressources spécifiques chauves-souris
-        self.is_falling = False  # Indique si la chauve-souris est en train de tomber
+        # Specific bat resources
+        self.is_falling = False  # Indicates whether the bat is falling
         self.fall_speed = 2 
 
-        # Initialiser la position selon le type
+        # Initialises position according to type
         if self.baddie_type in ['baddie1', 'baddie2']:
-            # Mouvement horizontal au sol
+            # Horizontal movement on the ground
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
                 GROUND_LEVEL,
@@ -59,7 +59,7 @@ class Baddie:
                 self.image.get_height()
             )
         elif self.baddie_type == 'baddie3':
-            # Mouvement volant
+            # Flying movement
             start_y = GROUND_LEVEL - 120
             self.rect = pygame.Rect(
                 WINDOWWIDTH, 
@@ -67,12 +67,12 @@ class Baddie:
                 self.image.get_width(),
                 self.image.get_height()
             )
-            # Oscillation verticale
+            # Vertical oscillation
             self.vertical_speed = 2
             self.amplitude_top = start_y - 200
             self.amplitude_bottom = start_y + 200
         elif self.baddie_type == 'baddie4':
-            # Mouvement tombant
+            # Falling movement
             self.rect = pygame.Rect(
                 random.randint(0, WINDOWWIDTH - self.image.get_width()), 
                 -self.image.get_height(),
@@ -81,44 +81,44 @@ class Baddie:
             )
 
     def move(self):
-        # Mouvement défini par le type
+        # Movement defined by type
         if self.baddie_type in ['baddie1', 'baddie2']:
-            # Mouvement horizontal classique
+            # Classic horizontal movement
             self.rect.move_ip(-self.speed, 0)
         elif self.baddie_type == 'baddie3':
-            # Mouvement volant avec oscillation verticale
+            # Flying movement with vertical oscillation
             self.rect.move_ip(-self.speed, self.vertical_speed)
-            # Inverser la direction verticale si nécessaire
+            # Reverse vertical direction if necessary
             if self.rect.top <= self.amplitude_top or self.rect.bottom >= self.amplitude_bottom:
                 self.vertical_speed *= -1
         elif self.baddie_type == 'baddie4':
-            # Mouvement vertical (chute)
+            # Vertical movement (fall)
             self.rect.move_ip(0, self.speed)
 
     def is_off_screen(self):
-        # Vérifier si le *baddie* est hors de l'écran
+        # Checks whether the *baddie* is off the screen
         return (
             self.rect.right < 0 or
             (self.baddie_type == 'baddie4' and self.rect.top > WINDOWHEIGHT)
         ) 
     
     def play_crush_animation(self, surface):
-        # Joue l'animation de destruction pour une citrouille
+        # Plays the destruction animation for a pumpkin
         if self.baddie_type == 'baddie1' and self.crush_sprites:
             for sprite in self.crush_sprites:
-                surface.blit(sprite, self.rect)  # Affiche chaque sprite à la position du baddie
+                surface.blit(sprite, self.rect)  # Displays each sprite at the baddie position
                 pygame.display.update()
-                pygame.time.delay(40)  # Pause entre chaque image
+                pygame.time.delay(40)  # Pause between each image
             if self.bounce_sound:
-                self.bounce_sound.play()  # Joue le son de rebond
+                self.bounce_sound.play()  # Plays the bounce sound
     
     def fall_to_ground(self):
-        # Fait tomber la chauve-souris doucement au sol
-        target_y = GROUND_LEVEL - self.rect.height  # Hauteur cible
+        # Drops the bat gently to the ground
+        target_y = GROUND_LEVEL - self.rect.height  # Target height
         if self.is_falling and self.rect.y < target_y:
             self.rect.y += self.fall_speed
         elif self.rect.y >= target_y:
-            self.is_falling = False  # Arrêter la chute lorsque la hauteur cible est atteinte
+            self.is_falling = False  # Stops the fall when the target height is reached
    
 class ObjectMagic:
     def __init__(self, image_path, scale_size, points, y_position, speed):
@@ -131,16 +131,16 @@ class ObjectMagic:
         self.speed = speed
 
     def move_and_draw(self, surface):
-        self.rect.x -= self.speed # Déplacer l'objet vers la gauche
-        if self.rect.right < 0: # Si l'objet sort de l'écran, le remettre à droite
+        self.rect.x -= self.speed # Moves object to the left
+        if self.rect.right < 0: # If the object leaves the screen, moves it back to the right
             self.rect.x = WINDOWWIDTH
-        surface.blit(self.image, self.rect) # Afficher l'image de l'objet sur la surface
+        surface.blit(self.image, self.rect) # Displays the image of the object on the surface
 
     def check_collision(self, player_rect):
-        if player_rect.colliderect(self.rect): # Vérifier la collision avec le joueur
-            self.rect.x = WINDOWWIDTH # Réinitialiser la position de l'objet à droite de l'écran après la collision
-            return self.points  # Retourne les points pour ajouter au score
-        return 0  # Pas de collision, pas de points
+        if player_rect.colliderect(self.rect): # Checks collision with player
+            self.rect.x = WINDOWWIDTH # Reset the position of the object to the right of the screen after the collision
+            return self.points  # Returns points to add to the score
+        return 0  # No collision, no points
 
 def terminate():
     pygame.quit()
@@ -158,22 +158,22 @@ def waitForPlayerToPressKey():
 
 def playerHasHitBaddie(playerRect, baddies):
     for baddie in baddies:
-        if playerRect.colliderect(baddie.rect):  # Vérifie la collision
-            # Cas 1 : Collision par le haut
+        if playerRect.colliderect(baddie.rect):  # Checks collision
+            # Case 1: Collision from above
             if playerRect.bottom <= baddie.rect.top + 10:
-                return baddie, True  # Collision par le haut
+                return baddie, True  # Collision from above
 
-            # Cas 2 : Collision par le bas (uniquement pour baddie3)
+            # Case 2: Collision from below (baddie3 only)
             elif baddie.baddie_type == 'baddie3' and playerRect.top <= baddie.rect.bottom and playerRect.centery > baddie.rect.bottom:
                 return baddie, "bas"  # Collision par le bas
 
-            # Cas 3 : Collision classique (côtés ou autre)
+            # Case 3: Classic collision (side or other)
             else:
-                return baddie, False  # Collision classique
-    return None, None  # Aucune collision
+                return baddie, False  # Classic collision 
+    return None, None  # No collision
 
 def get_baddie_types_by_level(level):
-    # Retourne les types de baddies disponibles pour un niveau donné
+    # Returns the types of baddies available for a given level
     if level == 1:
         return ['baddie1', 'baddie2']
     elif level == 2:
@@ -181,50 +181,50 @@ def get_baddie_types_by_level(level):
     elif level == 3:
         return ['baddie3', 'baddie4']
     else:
-        return []  # Aucun baddie pour les autres niveaux
+        return []  # No baddie for other levels
 
-def play_crush_animation(surface, baddie_rect): # Fonction pour l'animation de la citrouille
+def play_crush_animation(surface, baddie_rect): # Pumpkin animation function
     for sprite in crush_sprites:
         surface.blit(sprite, baddie_rect)
         pygame.display.update()
-        pygame.time.delay(40)  # Pause de 40 ms entre chaque image
+        pygame.time.delay(40)  # 40 ms pause between each image
 
 def displayGameOverScreen():
-    # Affiche l'écran de Game Over
-    global score  # Ajoutez cette ligne pour modifier la variable globale `score`.
-    windowSurface.fill((0, 0, 0))  # Fond noir
+    # Displays the Game Over screen
+    global score  # Adds this line to modify the global variable `score`.
+    windowSurface.fill((0, 0, 0))  # Black background
     drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 2), (255, 0, 0))
     drawText('Press any key to restart.', font, windowSurface, (WINDOWWIDTH / 3.5), (WINDOWHEIGHT / 2) + 50, TEXTCOLOR)
     pygame.display.update()
     waitForPlayerToPressKey()
-    score = 0  # Réinitialise le score après que le joueur a appuyé sur une touche.
+    score = 0  # Resets the score after the player has pressed a key.
 
 def displayWinScreen():
-    # Affiche la séquence de victoire avec trois images en boucle et attend une touche
+    # Displays the victory sequence with three images in a loop and waits for a key
     pygame.mixer.music.stop()
     win_images = [pygame.image.load(f'win{i}.png') for i in range(1, 4)]
     scaled_images = [pygame.transform.scale(image, (WINDOWWIDTH, WINDOWHEIGHT)) for image in win_images]
 
-    current_index = 0  # Index de l'image actuelle
-    animation_counter = 0  # Compteur pour l'animation
-    animation_speed = FPS // 12  # Vitesse d'animation (3 images par seconde)
+    current_index = 0  # Index of the current image
+    animation_counter = 0  # Counter for animation
+    animation_speed = FPS // 12  # Animation speed (3 frames per second)
 
     while True:
-        # Gestion des événements pour détecter une touche
+        # Event management to detect a button
         for event in pygame.event.get():
             if event.type == QUIT:
                 terminate()
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
-                return  # Quitte la fonction si une touche est pressée
+                return  # Exits the function if a key is pressed
 
-        # Afficher l'image actuelle
+        # Shows current image
         windowSurface.blit(scaled_images[current_index], (0, 0))
         drawText('Press any key to restart', font, windowSurface, WINDOWWIDTH // 3, WINDOWHEIGHT - 150, TEXTCOLOR)
         pygame.display.update()
 
-        # Gérer l'animation des images
+        # Manages the animation of images
         animation_counter += 1
         if animation_counter >= animation_speed:
             animation_counter = 0
@@ -241,7 +241,7 @@ def drawText(text, font, surface, x, y, color=None):
     surface.blit(textobj, textrect)
 
 def drawHearts(surface, lives, heartImage, start_x, start_y):
-    # Affiche les cœurs en fonction des vies restantes à une position donnée
+    # Displays hearts according to lives remaining at a given position
     for i in range(lives):
         surface.blit(heartImage, (start_x + i * (HEART_SIZE[0] + 5), start_y))
 
@@ -283,22 +283,22 @@ heartImage = pygame.image.load('heart.png')
 heartImage = pygame.transform.scale(heartImage, HEART_SIZE)
 backgroundImage_StartScreen = pygame.image.load('start.webp')
 bgImage_StartScreen = pygame.transform.scale(backgroundImage_StartScreen, (WINDOWWIDTH, WINDOWHEIGHT))
-# Images pour les ennemis
+# Baddies images
 baddie_images = [
     pygame.image.load('baddie1.png'),
     pygame.image.load('baddie2.png'),
     pygame.image.load('baddie3.png'),
     pygame.image.load('baddie4.png'),
 ]
-# Image pour l'animation de la citrouille 
+# Image for the pumpkin animation 
 crush_sprites = [
     pygame.transform.scale(
         pygame.image.load(f'Pumpkin{i}.png').convert_alpha(),
-        (BADDIEMAXSIZE, BADDIEMAXSIZE)  # Redimensionne les images à la taille maximale des baddies
+        (BADDIEMAXSIZE, BADDIEMAXSIZE)  # Resizes images to the maximum size of the baddies
     )
-    for i in range(1, 7)  # Charge Pumpkin1.png à Pumpkin6.png
+    for i in range(1, 7)  # Charges Pumpkin1.png à Pumpkin6.png
 ]
-# Images pour les backgrounds
+# Background images 
 backgrounds = { 
     1: pygame.transform.scale(pygame.image.load('Wood.jpg').convert(), (WINDOWWIDTH, WINDOWHEIGHT)),
     2: pygame.transform.scale(pygame.image.load('Wood2.jpg').convert(), (WINDOWWIDTH, WINDOWHEIGHT)),
@@ -317,12 +317,12 @@ game_over = False
 win = False 
 
 # Set up player.
-playerIndex = 0  # Index de l'image actuelle pour l'animation
-animationCounter = 0  # Compteur pour contrôler la vitesse d'animation
+playerIndex = 0  # Index of the current image for the animation
+animationCounter = 0  # Counter to control animation speed
 playerRect = playerImages[0].get_rect()
 
 # Set up lives.
-top_score_y = 40 + 50  # Position du "Top Score"
+top_score_y = 40 + 50  # "Top Score" position on the screen
 
 # Set up backgroundImage.
 Speed = 5 
@@ -332,43 +332,43 @@ bg_x = 0
 frog = ObjectMagic('Frog.png', (50,50), 200, GROUND_LEVEL, Speed)
 bird = ObjectMagic('Bird.png', (50,50), 300, GROUND_LEVEL, Speed)
 teapot = ObjectMagic('TeaPot.png', (50,50), 500, GROUND_LEVEL, Speed)
-# Initialiser position horizontale pour chaque objet
+# Sets horizontal position for each object
 frog.rect.x = WINDOWWIDTH
 bird.rect.x = WINDOWWIDTH
 teapot.rect.x = WINDOWWIDTH
 
-#Question bonus
+# Bonus question
 def questionScreen():
-    # Affiche une question avec une zone de réponse
+    # Displays a question with an answer box
     input_text = ""  
     question = "When is Halloween?" 
     score = 0 
 
-    # Boucle pour afficher l'écran de question
+    # Loop to display the question screen
     while True:
         windowSurface.blit(bgImage_StartScreen, (0, 0)) 
 
-        # Positionnement de la question et de la zone de texte
+        # Places the question and text box
         question_x = (WINDOWWIDTH - font.size(question)[0]) / 2
         question_y = WINDOWHEIGHT / 3
         input_box_x = (WINDOWWIDTH - 400) / 2 
         input_box_y = question_y + 70
 
-        # Afficher la question
+        # Show question
         drawText(question, font, windowSurface, question_x, question_y)
 
-        # Dessiner la zone de texte
+        # Draws the text box
         input_box = pygame.Rect(input_box_x, input_box_y, 400, 50)
         pygame.draw.rect(windowSurface, INPUTBOXCOLOR, input_box)
         pygame.draw.rect(windowSurface, TEXTCOLOR, input_box, 2)
 
-        # Afficher le texte saisi
+        # Displays text entered
         drawText(input_text, font, windowSurface, input_box.x + 10, input_box.y + 10)
 
-        # Mettre à jour l'affichage
+        # Updates display
         pygame.display.flip()
 
-        # Gestion des événements
+        # Event management
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -389,14 +389,14 @@ def questionScreen():
 
 score = questionScreen()
 
-# Écran de démarrage du jeu
+# Game start screen
 windowSurface.blit(bgImage_StartScreen, (0, 0))
 drawText('Spooky Sprint', font, windowSurface, (WINDOWWIDTH / 2.5), (WINDOWHEIGHT / 6))
 drawText(f'Your starting score: {score}', font, windowSurface, (WINDOWWIDTH / 2.5) - 30, (WINDOWHEIGHT / 6) + 60)
 drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 2.5) - 30, (WINDOWHEIGHT / 6) + 120)
 pygame.display.update()
 
-# Attente d'une touche pour commencer
+# Waiting for a keypress to start
 while True:
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -406,7 +406,7 @@ while True:
             if event.key == K_ESCAPE:
                 pygame.quit()
                 sys.exit()
-            # Débuter la partie après la touche pressée
+            # Start the game after the key has been pressed
             break
     else:
         continue
@@ -447,12 +447,12 @@ while True:
                     moveLeft = False
                     moveRight = True
                 if event.key == K_SPACE and not isJumping:
-                    # Premier saut
+                    # First jump 
                     isJumping = True 
                     canDoubleJump = True 
                     jumpSpeed = JUMPSPEED  
                 elif canDoubleJump :
-                    # Double saut 
+                    # Double jump 
                     canDoubleJump = False
                     jumpSpeed = JUMPSPEED
 
@@ -476,8 +476,8 @@ while True:
             baddieAddCounter += 1
         if baddieAddCounter == ADDNEWBADDIERATE:
             baddieAddCounter = 0
-            level_baddie_types = get_baddie_types_by_level(level)  # Obtenez les types pour le niveau
-            if level_baddie_types:  # Si des types sont disponibles pour ce niveau
+            level_baddie_types = get_baddie_types_by_level(level)  # Gets the types of baddie for the level
+            if level_baddie_types:  # If baddies types are available for this level
                 baddies.append(Baddie(baddie_images, BADDIEMINSIZE, BADDIEMAXSIZE, BADDIEMINSPEED, BADDIEMAXSPEED, level_baddie_types, crush_sprites=crush_sprites, bounce_sound=bounce_sound))
 
         # Move the player around.
@@ -496,54 +496,54 @@ while True:
                 playerRect.bottom = GROUND_LEVEL + 50 
                 isJumping = False
                 canDoubleJump = False
-                jumpSpeed = JUMPSPEED  # Réinitialise la vitesse de saut pour la prochaine fois
+                jumpSpeed = JUMPSPEED  # Resets jump speed for next time
 
         
         # Update player animation
         animationCounter += 1
         if animationCounter >= ANIMATION_SPEED:
             animationCounter = 0
-            playerIndex = (playerIndex + 1) % len(playerImages)  # Passer à l'image suivante en boucle
+            playerIndex = (playerIndex + 1) % len(playerImages)  # Passes to the next image in a loop
 
         # Move the baddies
         for b in baddies:
-            if b.is_falling:  # Si la chauve-souris est en train de tomber
-                b.fall_to_ground()  # Appliquer la chute
+            if b.is_falling:  # If the bat is falling
+                b.fall_to_ground()  # Applies the fall
             else:
-                # Mouvement normal
+                # Normal movement
                 if not reverseCheat and not slowCheat:
                     b.move() 
                 elif reverseCheat:
-                    b.rect.move_ip(5, 0)  # Mouvement inversé
+                    b.rect.move_ip(5, 0)  # Reverse movement
                 elif slowCheat:
-                    b.rect.move_ip(-1, 0)  # Mouvement ralenti
+                    b.rect.move_ip(-1, 0)  # Movement in slow motion
 
 
         # Delete baddies that have gone off the left side of the screen.
         baddies = [b for b in baddies if not b.is_off_screen()]
 
         # Draw scrolling background
-        bgImage = backgrounds[level] # définir background selon level
+        bgImage = backgrounds[level] # Defines background according to level
         windowSurface.blit(bgImage, (bg_x, 0))
         windowSurface.blit(bgImage, (bg_x + WINDOWWIDTH, 0))
-        bg_x -= Speed # déplacer arrière-plan vers la gauche
+        bg_x -= Speed # Moves background to the left
 
         if bg_x <= -WINDOWWIDTH:
             bg_x = 0
         
-        # Vérification si level a changé pour le sound
+        # Checks whether level has changed for the sound
         if level != previous_level:
             play_level_music(level)
             previous_level = level
         
         # Draw ObjectMagic with levels.
         if level == 1:
-            # Déplacement de l'objet frog
+            # Moves the frog object
             windowSurface.blit(frog.image, (frog.rect.x, frog.rect.y))
             frog.rect.x -= frog.speed
             if frog.rect.x <= -frog.rect.width:
                 frog.rect.x = WINDOWWIDTH
-            # Vérification collision player et objet magique
+            # Checks the collision between the player and the magic object
             if playerRect.colliderect(frog.rect):
                 score += frog.points
                 frog.rect.x = WINDOWWIDTH
@@ -566,11 +566,11 @@ while True:
                 score += teapot.points
                 teapot.rect.x = WINDOWWIDTH
                 collectObjectMagic.play()
-        # Passage au level suivant
+        # Goes to next level
         if score >= 1000 * level:
             level += 1
             if level > 3:
-                displayWinScreen()  # Affiche les images de victoire 
+                displayWinScreen()  # Displays victory images
                 level = 1 
                 score = 0 
                 break 
@@ -594,7 +594,7 @@ while True:
         hit_baddie, collision_type = playerHasHitBaddie(playerRect, baddies)
 
         if hit_baddie:
-            # Cas 1 : Citrouille (baddie1)
+            # Case 1: Pumpkin (baddie1)
             if hit_baddie.baddie_type == 'baddie1':
                 if collision_type == True:  
                     hit_baddie.play_crush_animation(windowSurface) 
@@ -602,12 +602,12 @@ while True:
                     isJumping = True
                     jumpSpeed = JUMPSPEED 
                 else:
-                    # Collision classique avec la citrouille
+                    # Classic collision with the pumpkin
                     lives -= 1
                     print(f"Vies restantes : {lives}")
                     baddies.remove(hit_baddie)
 
-            # Cas 2 : Chauve-souris (baddie3)
+            # Case 2: Bat (baddie3)
             elif hit_baddie.baddie_type == 'baddie3':
                 if hit_baddie.is_falling:
                     pass 
@@ -616,12 +616,12 @@ while True:
                     bonk_sound.play()
                     jumpSpeed = 0 
                 else:
-                    # Collision classique avec la chauve-souris
+                    # Classic collision with a bat
                     lives -= 1 
                     print(f"Vies restantes : {lives}")
                     baddies.remove(hit_baddie) 
            
-            # Cas 3 : Autres baddies
+            # Case 3: Other baddies
             else:
                 lives -= 1 
                 print(f"Vies restantes : {lives}")
