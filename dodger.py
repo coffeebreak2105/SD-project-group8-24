@@ -329,9 +329,9 @@ Speed = 5
 bg_x = 0 
 
 # Set up ObjectMagic.
-frog = ObjectMagic('Frog.png', (50,50), 200, GROUND_LEVEL, Speed)
-bird = ObjectMagic('Bird.png', (50,50), 300, GROUND_LEVEL, Speed)
-teapot = ObjectMagic('TeaPot.png', (50,50), 500, GROUND_LEVEL, Speed)
+frog = ObjectMagic('Frog.png', (50,50), 100, GROUND_LEVEL, Speed)
+bird = ObjectMagic('Bird.png', (50,50), 200, GROUND_LEVEL, Speed)
+teapot = ObjectMagic('TeaPot.png', (50,50), 300, GROUND_LEVEL, Speed)
 # Initialiser position horizontale pour chaque objet
 frog.rect.x = WINDOWWIDTH
 bird.rect.x = WINDOWWIDTH
